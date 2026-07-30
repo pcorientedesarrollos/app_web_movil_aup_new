@@ -92,7 +92,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {},
+          "options": {
+            "allowedHosts": [".railway.app", "localhost"]
+          },
           "configurations": {
             "production": {
               "buildTarget": "oaxacamiel-app:build:production"
