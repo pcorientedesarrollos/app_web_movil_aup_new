@@ -2,48 +2,50 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { VisitData } from '../models/visit.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class VisitasApiService {
   private http = inject(HttpClient);
+  private readonly base = `${environment.apiUrl}/api/visitas`;
 
   login(username: string, password: string): Promise<any> {
     return firstValueFrom(
-      this.http.post<any>('/api/visitas/auth/login', { username, password })
+      this.http.post<any>(`${this.base}/auth/login`, { username, password })
     );
   }
 
   getPerfil(): Promise<any> {
-    return firstValueFrom(this.http.get<any>('/api/visitas/auth/perfil'));
+    return firstValueFrom(this.http.get<any>(`${this.base}/auth/perfil`));
   }
 
   getVisitaActiva(): Promise<any> {
-    return firstValueFrom(this.http.get<any>('/api/visitas/apicultor/visita-activa'));
+    return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/visita-activa`));
   }
 
   getMisReportes(): Promise<any> {
-    return firstValueFrom(this.http.get<any>('/api/visitas/apicultor/mis-reportes'));
+    return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/mis-reportes`));
   }
 
   getReporteDetalle(id: string): Promise<any> {
-    return firstValueFrom(this.http.get<any>(`/api/visitas/apicultor/mis-reportes/${id}`));
+    return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/mis-reportes/${id}`));
   }
 
   iniciarReporte(visitaId: string): Promise<any> {
     return firstValueFrom(
-      this.http.post<any>('/api/visitas/apicultor/reportes', { visitaId })
+      this.http.post<any>(`${this.base}/apicultor/reportes`, { visitaId })
     );
   }
 
   saveReporte(reporteId: string, data: Partial<VisitData>): Promise<any> {
     return firstValueFrom(
-      this.http.patch<any>(`/api/visitas/apicultor/reportes/${reporteId}`, this.toApiDto(data))
+      this.http.patch<any>(`${this.base}/apicultor/reportes/${reporteId}`, this.toApiDto(data))
     );
   }
 
   enviarReporte(reporteId: string): Promise<any> {
     return firstValueFrom(
-      this.http.post<any>(`/api/visitas/apicultor/reportes/${reporteId}/enviar`, {})
+      this.http.post<any>(`${this.base}/apicultor/reportes/${reporteId}/enviar`, {})
     );
   }
 

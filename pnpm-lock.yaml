@@ -32,12 +32,6 @@ importers:
       '@angular/router':
         specifier: ^18.2.0
         version: 18.2.14(@angular/common@18.2.14(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10))(@angular/platform-browser@18.2.14(@angular/animations@18.2.14(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10)))(@angular/common@18.2.14(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10)))(rxjs@7.8.2)
-      express:
-        specifier: ^4.19.2
-        version: 4.22.2
-      http-proxy-middleware:
-        specifier: ^3.0.3
-        version: 3.0.5
       rxjs:
         specifier: ~7.8.0
         version: 7.8.2
