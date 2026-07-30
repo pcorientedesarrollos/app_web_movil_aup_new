@@ -1,0 +1,68 @@
+<div class="flex flex-col min-h-full bg-cream">
+
+  <!-- Header -->
+  <div class="bg-cream-pure px-5 pt-4 pb-4 border-b border-cream-tan">
+    <div class="flex items-center gap-3">
+      <a routerLink="/visits"
+         class="w-8 h-8 flex items-center justify-center rounded-full text-brown-muted active:bg-cream-tan">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </a>
+      <div>
+        <h2 class="text-base font-bold text-brown">Reporte de Visita</h2>
+        <p class="text-xs text-brown-muted">{{ fechaVisita }}</p>
+      </div>
+      @if (!loading()) {
+        <span class="ml-auto status-badge" [class]="estadoCls">{{ estadoLabel }}</span>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  }
+
+  @if (!loading() && reporte()) {
+    <div class="flex-1 px-5 py-4 flex flex-col gap-4">
+
+      <!-- Inspector notes -->
+      @if (observacionesInspector) {
+        <div class="rounded-xl bg-error-bg border border-error/20 px-4 py-3">
+          <p class="text-xs font-bold text-error uppercase tracking-wide mb-1">Notas del inspector</p>
+          <p class="text-sm text-error/80">{{ observacionesInspector }}</p>
+        </div>
+      }
+
+      <!-- Data table -->
+      <div class="rounded-2xl border border-cream-tan overflow-hidden bg-cream-pure">
+        @for (row of tableRows; track row.label) {
+          <div class="flex items-start gap-3 px-4 py-3 border-b border-cream-tan/50 last:border-0">
+            <span class="text-xs text-brown-muted w-32 flex-shrink-0 font-medium pt-0.5">{{ row.label }}</span>
+            <span class="text-xs text-brown font-mono flex-1">{{ row.value }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Read-only notice -->
+      <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-cream-tan">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A7550" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <p class="text-xs text-brown-muted">Este reporte es de solo lectura. Contacta a tu coordinador para solicitar correcciones.</p>
+      </div>
+    </div>
+  }
+
+  @if (!loading() && !reporte()) {
+    <div class="flex flex-col items-center justify-center py-16 px-5 text-center">
+      <p class="text-sm text-brown-muted">No se encontró el reporte</p>
+      <a routerLink="/visits" class="mt-4 text-sm text-gold underline">Volver al historial</a>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,53 @@
+<div class="min-h-screen bg-cream-pure flex flex-col items-center justify-center px-6 py-10 text-center">
+
+  <!-- Icon -->
+  <div class="relative mb-8">
+    <div class="w-28 h-28 rounded-full flex items-center justify-center"
+         [class]="isOffline() ? 'bg-cream-tan' : 'bg-gold/20'">
+      @if (isOffline()) {
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8A7550" stroke-width="2">
+          <path d="M1 1l22 22"/>
+          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+          <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+          <line x1="12" y1="20" x2="12.01" y2="20"/>
+        </svg>
+      } @else {
+        <div class="w-20 h-20 rounded-full bg-gold flex items-center justify-center">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Message -->
+  <h1 class="text-2xl font-bold text-brown mb-3">
+    {{ isOffline() ? 'Guardado sin conexión' : 'Visita enviada' }}
+  </h1>
+  <p class="text-sm text-brown-muted leading-relaxed max-w-xs">
+    @if (isOffline()) {
+      Tu reporte se guardó localmente. Se enviará automáticamente cuando recuperes la conexión a internet.
+    } @else {
+      Tu reporte de visita ha sido enviado exitosamente al coordinador de Oaxaca Miel.
+    }
+  </p>
+
+  <!-- Actions -->
+  <div class="flex flex-col gap-3 w-full max-w-xs mt-10">
+    <a routerLink="/visits" class="btn-primary text-center block py-4">
+      Ver mis visitas
+    </a>
+    <a routerLink="/dashboard" class="btn-secondary text-center block py-4">
+      Volver al inicio
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <p class="text-xs text-brown-muted/40 mt-8">
+    Oaxaca Miel · Programa de certificación orgánica
+  </p>
+</div>

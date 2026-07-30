@@ -1,0 +1,146 @@
+<div class="flex flex-col min-h-full bg-cream">
+
+  <!-- Header -->
+  <div class="bg-cream-pure px-5 pt-5 pb-4 border-b border-cream-tan">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="text-xs text-brown-muted font-medium uppercase tracking-wide">Apicultor</p>
+        <h2 class="text-base font-bold text-brown mt-0.5">{{ auth.currentUser()?.nombre }}</h2>
+        <p class="font-mono text-xs text-brown-muted/70 mt-0.5">{{ auth.currentUser()?.username }}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        @if (offline.isOffline()) {
+          <div class="flex items-center gap-1.5 px-2.5 py-1 bg-error-bg rounded-full">
+            <div class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></div>
+            <span class="text-xs text-error font-medium">Sin conexión</span>
+          </div>
+        } @else {
+          <div class="flex items-center gap-1.5 px-2.5 py-1 bg-success-bg rounded-full">
+            <div class="w-1.5 h-1.5 rounded-full bg-success"></div>
+            <span class="text-xs text-success font-medium">En línea</span>
+          </div>
+        }
+        <div class="w-10 h-10 rounded-xl bg-cream-tan flex items-center justify-center">
+          <img src="assets/images/logo-login.png" class="w-7 h-7 object-contain"
+               alt="Logo" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline banner -->
+  <app-offline-banner />
+
+  <!-- Content -->
+  <div class="flex-1 px-5 py-5 pb-24 flex flex-col gap-4">
+
+    <!-- Compliance seal -->
+    <div class="rounded-2xl bg-brown-light text-cream-pure p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p class="text-xs text-cream-tan/70 font-medium uppercase tracking-wide">Cumplimiento</p>
+          <p class="text-lg font-bold mt-0.5">
+            {{ completedCount() }}<span class="text-cream-tan/60">/{{ totalMonths() }}</span>
+          </p>
+          <p class="text-xs text-cream-tan/70 mt-0.5">reportes mensuales</p>
+        </div>
+        <div class="flex gap-1.5 flex-wrap justify-end max-w-[120px]">
+          @for (i of [0,1,2,3,4,5,6]; track i) {
+            <div class="w-3 h-3 rounded-full"
+                 [class]="i < completedCount() ? 'bg-gold' : 'bg-cream-tan/20'">
+            </div>
+          }
+        </div>
+      </div>
+      <div class="w-full h-1.5 bg-cream-tan/20 rounded-full overflow-hidden">
+        <div class="h-full bg-gold rounded-full transition-all"
+             [style.width.%]="totalMonths() > 0 ? (completedCount() / totalMonths()) * 100 : 0"></div>
+      </div>
+    </div>
+
+    <!-- Section title -->
+    <div class="flex items-center justify-between">
+      <h3 class="text-sm font-bold text-brown uppercase tracking-wide">Visita activa</h3>
+    </div>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex justify-center py-8">
+        <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }
+
+    <!-- Active visit card -->
+    @if (!loading() && visitaActiva()) {
+      <div class="rounded-2xl overflow-hidden shadow-card"
+           [ngClass]="getUrgencyClass(visitaActiva()!.fecha)">
+        <div class="p-4">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                @if (diasRestantes(visitaActiva()!.fecha) < 0) {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-error text-cream-pure text-[10px] font-bold uppercase rounded-full">
+                    <div class="w-1.5 h-1.5 rounded-full bg-cream-pure animate-pulse"></div>
+                    Vencida
+                  </span>
+                } @else if (diasRestantes(visitaActiva()!.fecha) <= 3) {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gold text-brown text-[10px] font-bold uppercase rounded-full">
+                    Urgente
+                  </span>
+                }
+              </div>
+              <h4 class="text-base font-bold text-brown mt-1">{{ formatFecha(visitaActiva()!.fecha) }}</h4>
+              <p class="font-mono text-xs text-brown-muted mt-0.5">
+                {{ visitaActiva()!.tipoVisita === 'RUTINARIA' ? 'Visita rutinaria' : 'Inspección' }}
+              </p>
+              @if (visitaActiva()!.reporte) {
+                <p class="text-xs text-brown-muted/70 mt-0.5">
+                  Reporte: {{ estadoLabel(visitaActiva()!.reporte!.estado) }}
+                </p>
+              }
+            </div>
+            <div class="text-right">
+              @if (diasRestantes(visitaActiva()!.fecha) >= 0) {
+                <p class="text-3xl font-bold text-brown leading-none">{{ diasRestantes(visitaActiva()!.fecha) }}</p>
+                <p class="text-xs text-brown-muted mt-0.5">días</p>
+              } @else {
+                <p class="text-2xl font-bold text-error leading-none">{{ diasRestantes(visitaActiva()!.fecha) * -1 }}</p>
+                <p class="text-xs text-error/70 mt-0.5">atrasada</p>
+              }
+            </div>
+          </div>
+
+          @if (!visitaActiva()!.reporte || visitaActiva()!.reporte!.estado === 'BORRADOR') {
+            <button (click)="startForm()"
+              class="w-full py-3 rounded-xl font-semibold text-sm transition-opacity active:opacity-80"
+              [class]="diasRestantes(visitaActiva()!.fecha) < 0 ? 'bg-error text-cream-pure' : 'bg-gold text-brown'">
+              {{ visitaActiva()!.reporte?.estado === 'BORRADOR' ? 'Continuar reporte' : 'Registrar visita' }}
+            </button>
+          } @else {
+            <div class="w-full py-3 rounded-xl bg-success-bg text-center">
+              <span class="text-sm font-semibold text-success">Reporte enviado ✓</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- No active visit -->
+    @if (!loading() && !visitaActiva()) {
+      <div class="flex flex-col items-center justify-center py-12 text-center">
+        <div class="w-16 h-16 rounded-full bg-success-bg flex items-center justify-center mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2F6B3E" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h4 class="text-base font-bold text-brown">¡Al día!</h4>
+        <p class="text-sm text-brown-muted mt-1">No hay visita activa en este momento</p>
+      </div>
+    }
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="sticky bottom-0">
+    <app-bottom-nav />
+  </div>
+</div>

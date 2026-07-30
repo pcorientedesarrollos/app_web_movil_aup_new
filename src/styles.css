@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply font-sans bg-brown-light;
+  }
+  input, textarea, select {
+    @apply outline-none;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply w-full py-4 rounded-2xl bg-gold text-brown font-semibold text-base
+           active:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply w-full py-4 rounded-2xl border border-brown-muted text-brown-muted
+           font-semibold text-base active:opacity-90 transition-opacity;
+  }
+  .form-input {
+    @apply w-full px-4 py-3.5 rounded-xl border border-cream-tan bg-cream-pure
+           text-brown font-mono text-sm placeholder-brown-muted/50
+           focus:border-gold focus:ring-1 focus:ring-gold transition-colors;
+  }
+  .form-label {
+    @apply block text-xs font-semibold text-brown-muted uppercase tracking-wide mb-1.5;
+  }
+  .card {
+    @apply bg-cream-pure rounded-2xl p-4 shadow-card;
+  }
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide;
+  }
+}

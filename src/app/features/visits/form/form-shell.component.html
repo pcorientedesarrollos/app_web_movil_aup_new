@@ -1,0 +1,55 @@
+<div class="flex flex-col min-h-full bg-cream">
+
+  <!-- Header / Progress -->
+  <div class="bg-cream-pure px-5 pt-4 pb-4 border-b border-cream-tan sticky top-0 z-10">
+    <div class="flex items-center gap-3 mb-3">
+      <button (click)="store.prevStep()"
+              [disabled]="store.currentStep() === 0"
+              class="w-8 h-8 flex items-center justify-center rounded-full
+                     text-brown-muted disabled:opacity-30 active:bg-cream-tan transition-colors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div class="flex-1 text-center">
+        <span class="text-xs font-semibold text-brown-muted uppercase tracking-wide">
+          Paso {{ store.currentStep() + 1 }} de 10
+        </span>
+      </div>
+      @if (store.lastSaved()) {
+        <span class="text-[10px] text-brown-muted/50 flex items-center gap-1">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Guardado
+        </span>
+      } @else {
+        <div class="w-12"></div>
+      }
+    </div>
+
+    <!-- Progress bar -->
+    <div class="w-full h-1.5 bg-cream-tan rounded-full overflow-hidden mb-2">
+      <div class="h-full bg-gold rounded-full transition-all duration-300 ease-out"
+           [style.width.%]="store.progressPct()">
+      </div>
+    </div>
+    <h2 class="text-sm font-bold text-brown">{{ stepTitle }}</h2>
+  </div>
+
+  <!-- Step content -->
+  <div class="flex-1 overflow-y-auto px-5 py-5 pb-6">
+    @switch (store.currentStep()) {
+      @case (0) { <app-step-visit-data /> }
+      @case (1) { <app-step-hive-count /> }
+      @case (2) { <app-step-maintenance /> }
+      @case (3) { <app-step-feeding /> }
+      @case (4) { <app-step-varroa /> }
+      @case (5) { <app-step-pest-control /> }
+      @case (6) { <app-step-wax /> }
+      @case (7) { <app-step-queen /> }
+      @case (8) { <app-step-harvest /> }
+      @case (9) { <app-step-notes /> }
+    }
+  </div>
+</div>

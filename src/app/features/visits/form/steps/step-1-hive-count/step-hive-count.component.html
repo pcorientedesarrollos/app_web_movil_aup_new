@@ -1,0 +1,44 @@
+<form [formGroup]="form" class="flex flex-col gap-5">
+
+  <!-- Main counts -->
+  <div class="grid grid-cols-3 gap-3">
+    @for (field of [
+      {ctrl:'colmenasInicial', label:'Colmenas anteriores'},
+      {ctrl:'colmenasPerdidas', label:'Bajas'},
+      {ctrl:'colmenasAumentadas', label:'Altas'}
+    ]; track field.ctrl) {
+      <div>
+        <label class="form-label text-center block">{{ field.label }}</label>
+        <input type="number" [formControlName]="field.ctrl" min="0"
+               class="form-input text-center text-lg font-bold">
+      </div>
+    }
+  </div>
+
+  <!-- Calculated total -->
+  <div class="rounded-2xl bg-brown-light p-4 text-center">
+    <p class="text-xs text-cream-tan/60 font-medium uppercase tracking-wide mb-1">Total actual de colmenas</p>
+    <p class="text-4xl font-bold text-cream-pure">{{ store.hiveCount() }}</p>
+  </div>
+
+  <!-- Causes grid -->
+  <div>
+    <p class="form-label mb-3">Causas de movimiento</p>
+    <div class="grid grid-cols-2 gap-3">
+      @for (field of [
+        {ctrl:'causasMuerteEnjambre', label:'Muerte / Enjambrazón'},
+        {ctrl:'causasTraslado', label:'Traslado'},
+        {ctrl:'causasDivisiones', label:'Divisiones'},
+        {ctrl:'causasNucleos', label:'Núcleos'}
+      ]; track field.ctrl) {
+        <div class="card p-3">
+          <label class="form-label">{{ field.label }}</label>
+          <input type="number" [formControlName]="field.ctrl" min="0" class="form-input mt-1">
+        </div>
+      }
+    </div>
+  </div>
+
+  <button type="button" (click)="store.nextStep()" class="btn-primary">Continuar</button>
+  <button type="button" (click)="store.prevStep()" class="btn-secondary -mt-2">Atrás</button>
+</form>

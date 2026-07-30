@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://comprasbackendaup-production.up.railway.app",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

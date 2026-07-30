@@ -1,0 +1,45 @@
+<form [formGroup]="form" class="flex flex-col gap-5">
+
+  <!-- Miel -->
+  <div class="card p-4">
+    <label class="flex items-center gap-3 cursor-pointer mb-3">
+      <div class="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all"
+           [class]="form.get('cosechaMiel')!.value ? 'border-gold bg-gold' : 'border-brown-muted/30'"
+           (click)="form.get('cosechaMiel')!.setValue(!form.get('cosechaMiel')!.value)">
+        @if (form.get('cosechaMiel')!.value) {
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+        }
+      </div>
+      <span class="text-sm font-semibold text-brown">Se cosechó miel</span>
+    </label>
+    @if (form.get('cosechaMiel')!.value) {
+      <div>
+        <label class="form-label">Kilos cosechados</label>
+        <input type="number" formControlName="cosechaMielKg" min="0" step="0.1" class="form-input mt-1">
+      </div>
+    }
+  </div>
+
+  <!-- Cera -->
+  <div class="card p-4">
+    <label class="flex items-center gap-3 cursor-pointer mb-3">
+      <div class="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all"
+           [class]="form.get('cosechaCera')!.value ? 'border-gold bg-gold' : 'border-brown-muted/30'"
+           (click)="form.get('cosechaCera')!.setValue(!form.get('cosechaCera')!.value)">
+        @if (form.get('cosechaCera')!.value) {
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+        }
+      </div>
+      <span class="text-sm font-semibold text-brown">Se cosechó cera</span>
+    </label>
+    @if (form.get('cosechaCera')!.value) {
+      <div>
+        <label class="form-label">Kilos cosechados</label>
+        <input type="number" formControlName="cosechaCeraKg" min="0" step="0.1" class="form-input mt-1">
+      </div>
+    }
+  </div>
+
+  <button type="button" (click)="store.nextStep()" class="btn-primary">Continuar</button>
+  <button type="button" (click)="store.prevStep()" class="btn-secondary -mt-2">Atrás</button>
+</form>

@@ -1,0 +1,48 @@
+<form [formGroup]="form" class="flex flex-col gap-5">
+
+  <!-- Notes -->
+  <div>
+    <label class="form-label">Observaciones</label>
+    <textarea formControlName="notas" rows="4"
+              placeholder="Anota observaciones relevantes de la visita..."
+              class="form-input resize-none"></textarea>
+  </div>
+
+  <!-- Signature -->
+  <div>
+    <label class="form-label">Firma del apicultor</label>
+    <app-signature-pad (signatureChange)="onSignatureChange($event)" class="block mt-1" />
+  </div>
+
+  <!-- Summary -->
+  <div class="rounded-2xl border border-cream-tan overflow-hidden">
+    <div class="bg-cream-tan/50 px-4 py-2.5">
+      <h4 class="text-xs font-bold text-brown-muted uppercase tracking-wide">Resumen del reporte</h4>
+    </div>
+    @for (row of summaryRows; track row.label) {
+      <div class="flex items-start gap-2 px-4 py-2.5 border-t border-cream-tan/50 first:border-0">
+        <span class="text-xs text-brown-muted w-24 flex-shrink-0 font-medium pt-0.5">{{ row.label }}</span>
+        <span class="text-xs text-brown font-mono flex-1">{{ row.value }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Actions -->
+  <button type="button" (click)="submit()" [disabled]="store.isSubmitting()" class="btn-primary">
+    @if (store.isSubmitting()) {
+      <span class="flex items-center justify-center gap-2">
+        <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+          <path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="1"/>
+        </svg>
+        Enviando...
+      </span>
+    } @else if (offline.isOffline()) {
+      Guardar sin conexión
+    } @else {
+      Enviar reporte
+    }
+  </button>
+  <button type="button" (click)="saveDraft()" class="btn-secondary -mt-2">Guardar borrador</button>
+  <button type="button" (click)="store.prevStep()" class="text-sm text-brown-muted text-center py-2">Atrás</button>
+</form>

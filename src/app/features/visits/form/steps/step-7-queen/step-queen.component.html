@@ -1,0 +1,39 @@
+<form [formGroup]="form" class="flex flex-col gap-5">
+
+  <div>
+    <label class="form-label">Número de reinas introducidas</label>
+    <input type="number" formControlName="reinasReemplazadas" min="0" class="form-input">
+  </div>
+
+  <div>
+    <label class="form-label">Origen de la reina</label>
+    <div class="flex flex-col gap-2 mt-1">
+      @for (opt of [
+        {v:'PROPIA', l:'Propia (crianza propia)', desc:''},
+        {v:'COMPRADA', l:'Comprada', desc:'Se requiere factura'},
+        {v:'CACAHUATERA', l:'Reina cacahuatera', desc:'Celda real sin criar'}
+      ]; track opt.v) {
+        <label class="flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
+               [class]="form.get('origenReina')!.value === opt.v
+                 ? 'border-gold bg-gold/10' : 'border-cream-tan bg-cream-pure'">
+          <input type="radio" formControlName="origenReina" [value]="opt.v" class="hidden">
+          <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5"
+               [class]="form.get('origenReina')!.value === opt.v ? 'border-gold' : 'border-brown-muted/30'">
+            @if (form.get('origenReina')!.value === opt.v) {
+              <div class="w-2 h-2 rounded-full bg-gold"></div>
+            }
+          </div>
+          <div>
+            <span class="text-sm font-medium text-brown block">{{ opt.l }}</span>
+            @if (opt.desc) {
+              <span class="text-xs text-brown-muted">{{ opt.desc }}</span>
+            }
+          </div>
+        </label>
+      }
+    </div>
+  </div>
+
+  <button type="button" (click)="store.nextStep()" class="btn-primary">Continuar</button>
+  <button type="button" (click)="store.prevStep()" class="btn-secondary -mt-2">Atrás</button>
+</form>

@@ -1,0 +1,58 @@
+<form [formGroup]="form" class="flex flex-col gap-5">
+
+  <!-- Fecha -->
+  <div>
+    <label class="form-label">Fecha de visita</label>
+    <input type="date" formControlName="fecha" class="form-input">
+  </div>
+
+  <!-- Tipo -->
+  <div>
+    <label class="form-label">Tipo de visita</label>
+    <div class="grid grid-cols-2 gap-3 mt-1">
+      @for (opt of [{v:'RUTINA', l:'Rutinaria'},{v:'INSPECCION', l:'Inspección'}]; track opt.v) {
+        <label class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
+               [class]="form.get('tipo')!.value === opt.v
+                 ? 'border-gold bg-gold/10 shadow-sm'
+                 : 'border-cream-tan bg-cream-pure'">
+          <input type="radio" formControlName="tipo" [value]="opt.v" class="hidden">
+          <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+               [class]="form.get('tipo')!.value === opt.v ? 'border-gold' : 'border-brown-muted/30'">
+            @if (form.get('tipo')!.value === opt.v) {
+              <div class="w-2 h-2 rounded-full bg-gold"></div>
+            }
+          </div>
+          <span class="text-sm font-medium text-brown">{{ opt.l }}</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <!-- Apiarios -->
+  <div>
+    <label class="form-label">Apiarios a revisar</label>
+    <div class="flex flex-col gap-2 mt-1">
+      @for (a of apiaries(); track a.id) {
+        <label (click)="toggleApiary(a.id)"
+               class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
+               [class]="isApiarySelected(a.id)
+                 ? 'border-gold bg-gold/10'
+                 : 'border-cream-tan bg-cream-pure'">
+          <div class="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0"
+               [class]="isApiarySelected(a.id) ? 'border-gold bg-gold' : 'border-brown-muted/30'">
+            @if (isApiarySelected(a.id)) {
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            }
+          </div>
+          <span class="font-mono text-xs text-brown leading-snug">{{ a.label }}</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <button type="button" (click)="next()" class="btn-primary mt-2">
+    Continuar
+  </button>
+</form>

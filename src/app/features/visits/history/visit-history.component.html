@@ -1,0 +1,55 @@
+<div class="flex flex-col min-h-full bg-cream">
+
+  <!-- Header -->
+  <div class="bg-cream-pure px-5 pt-5 pb-4 border-b border-cream-tan">
+    <h2 class="text-lg font-bold text-brown">Mis Visitas</h2>
+    <p class="text-sm text-brown-muted mt-0.5">Historial de reportes enviados</p>
+  </div>
+
+  <!-- List -->
+  <div class="flex-1 px-5 py-4 pb-24 flex flex-col gap-3">
+
+    @if (loading()) {
+      <div class="flex justify-center py-16">
+        <div class="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }
+
+    @for (r of reportes(); track r.id) {
+      <a [routerLink]="['/visits', r.id]"
+         class="card flex items-center gap-4 active:opacity-80 transition-opacity">
+        <!-- Month diamond -->
+        <div class="w-12 h-12 rounded-xl bg-gold/15 flex flex-col items-center justify-center flex-shrink-0">
+          <span class="font-bold text-gold text-xs uppercase leading-none">{{ mesCorto(r.fechaVisita) }}</span>
+          <span class="font-mono text-[10px] text-brown-muted">{{ anio(r.fechaVisita) }}</span>
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-brown truncate">{{ mesCompleto(r.fechaVisita) }}</p>
+          <p class="text-xs text-brown-muted mt-0.5">
+            {{ r.fechaVisita ?? r.createdAt | date:'d MMM yyyy' }} · {{ tipoLabel(r.tipoVisitaApicultor) }}
+          </p>
+          <span class="status-badge mt-1.5" [ngClass]="getStatusConfig(r.estado).cls">
+            {{ getStatusConfig(r.estado).label }}
+          </span>
+        </div>
+
+        <!-- Arrow -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8916A" stroke-width="2" class="flex-shrink-0">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </a>
+    }
+
+    @if (!loading() && reportes().length === 0) {
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <p class="text-sm text-brown-muted">Aún no tienes visitas registradas</p>
+      </div>
+    }
+  </div>
+
+  <div class="sticky bottom-0">
+    <app-bottom-nav />
+  </div>
+</div>

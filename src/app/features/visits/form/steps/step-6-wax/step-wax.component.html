@@ -1,0 +1,53 @@
+<form [formGroup]="form" class="flex flex-col gap-5">
+
+  <div>
+    <label class="form-label">Número de láminas de cera</label>
+    <input type="number" formControlName="ceraLaminas" min="0" class="form-input">
+  </div>
+
+  <div>
+    <label class="form-label">Origen de la cera</label>
+    <div class="grid grid-cols-2 gap-3 mt-1">
+      @for (opt of [{v:'COMPRADA', l:'Comprada'},{v:'MAQUINA', l:'Máquina propia'}]; track opt.v) {
+        <label class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
+               [class]="form.get('origenCera')!.value === opt.v
+                 ? 'border-gold bg-gold/10' : 'border-cream-tan bg-cream-pure'">
+          <input type="radio" formControlName="origenCera" [value]="opt.v" class="hidden">
+          <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+               [class]="form.get('origenCera')!.value === opt.v ? 'border-gold' : 'border-brown-muted/30'">
+            @if (form.get('origenCera')!.value === opt.v) {
+              <div class="w-2 h-2 rounded-full bg-gold"></div>
+            }
+          </div>
+          <span class="text-sm font-medium text-brown">{{ opt.l }}</span>
+        </label>
+      }
+    </div>
+    <p class="mt-2 text-xs text-brown-muted bg-cream-tan rounded-lg px-3 py-2">
+      Se requieren comprobantes de compra para cualquier origen
+    </p>
+  </div>
+
+  <div>
+    <label class="form-label">¿Marcos identificados con cera nueva?</label>
+    <div class="grid grid-cols-2 gap-3 mt-1">
+      @for (opt of [{v:true, l:'Sí'},{v:false, l:'No'}]; track opt.l) {
+        <label class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
+               [class]="form.get('marcosIdentificados')!.value === opt.v
+                 ? 'border-gold bg-gold/10' : 'border-cream-tan bg-cream-pure'">
+          <input type="radio" formControlName="marcosIdentificados" [value]="opt.v" class="hidden">
+          <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+               [class]="form.get('marcosIdentificados')!.value === opt.v ? 'border-gold' : 'border-brown-muted/30'">
+            @if (form.get('marcosIdentificados')!.value === opt.v) {
+              <div class="w-2 h-2 rounded-full bg-gold"></div>
+            }
+          </div>
+          <span class="text-sm font-medium text-brown">{{ opt.l }}</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <button type="button" (click)="store.nextStep()" class="btn-primary">Continuar</button>
+  <button type="button" (click)="store.prevStep()" class="btn-secondary -mt-2">Atrás</button>
+</form>
