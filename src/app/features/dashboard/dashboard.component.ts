@@ -20,9 +20,9 @@ export class DashboardComponent implements OnInit {
   readonly auth    = inject(AuthService);
   readonly offline = inject(OfflineService);
 
-  readonly visitaActiva  = signal<VisitaActivaResponse | null>(null);
+  readonly visitaActiva   = signal<VisitaActivaResponse | null>(null);
   readonly completedCount = signal(0);
-  readonly totalMonths    = signal(0);
+  readonly totalAnual     = 24;
   readonly loading        = signal(true);
 
   async ngOnInit(): Promise<void> {
@@ -45,8 +45,11 @@ export class DashboardComponent implements OnInit {
     try {
       const res = await this.visitas.getMisReportes();
       if (res.success && Array.isArray(res.data)) {
-        const reportes: MiReporteItem[] = res.data;
-        this.totalMonths.set(reportes.length);
+        const anioActual = new Date().getFullYear();
+        const reportes: MiReporteItem[] = res.data.filter((r: MiReporteItem) => {
+          const fecha = r.fechaVisita ?? r.createdAt;
+          return fecha && new Date(fecha).getFullYear() === anioActual;
+        });
         this.completedCount.set(
           reportes.filter(r => r.estado === 'ENVIADO' || r.estado === 'REVISADO' || r.estado === 'CON_OBSERVACIONES').length
         );

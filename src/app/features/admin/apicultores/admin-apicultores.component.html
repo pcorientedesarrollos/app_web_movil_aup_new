@@ -1,0 +1,130 @@
+<div class="min-h-screen bg-cream flex flex-col">
+
+  <!-- Header -->
+  <div class="bg-brown px-5 pt-5 pb-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs text-cream-tan/60 font-medium uppercase tracking-wide">Administrador</p>
+        <h1 class="text-lg font-bold text-cream-pure mt-0.5">Apicultores Orgánicos</h1>
+        <p class="text-xs text-cream-tan/50 mt-0.5">{{ auth.currentAdmin()?.nombre }}</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9973A" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <button (click)="cerrarSesion()"
+          class="text-cream-tan/60 hover:text-cream-pure transition-colors">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="mt-4 relative">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-brown-muted/40" width="16" height="16"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input [(ngModel)]="searchText" (keyup.enter)="onSearch()" type="text"
+        placeholder="Buscar apicultor..."
+        class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-cream text-brown text-sm
+               focus:outline-none focus:ring-2 focus:ring-gold/40 placeholder:text-brown-muted/40">
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="flex-1 px-5 py-4 flex flex-col gap-3">
+
+    <!-- Counter -->
+    @if (!loading()) {
+      <p class="text-xs text-brown-muted font-medium">
+        {{ apicultores().length }} apicultor{{ apicultores().length !== 1 ? 'es' : '' }} con miel orgánica
+      </p>
+    }
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex justify-center py-16">
+        <div class="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (errorMsg()) {
+      <div class="px-4 py-3 bg-error-bg rounded-xl">
+        <p class="text-sm text-error">{{ errorMsg() }}</p>
+      </div>
+    }
+
+    <!-- Lista -->
+    @for (a of apicultores(); track a.id) {
+      <div class="bg-cream-pure rounded-2xl border border-cream-tan p-4 flex items-center gap-4 shadow-card">
+
+        <!-- Avatar -->
+        <div class="w-11 h-11 rounded-xl bg-brown-light/20 flex items-center justify-center flex-shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A5C3A" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-brown truncate">{{ a.nombreCompleto }}</p>
+          <p class="font-mono text-xs text-brown-muted mt-0.5">{{ a.codigo }}</p>
+          @if (a.localidad) {
+            <p class="text-xs text-brown-muted/70 mt-0.5">{{ a.localidad }}</p>
+          }
+          <div class="flex items-center gap-2 mt-1.5">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-success-bg text-success text-[10px] font-bold uppercase rounded-full">
+              Orgánico
+            </span>
+            @if (a.acceso) {
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-full"
+                [class]="a.acceso.activo ? 'bg-cream-tan/50 text-brown-muted' : 'bg-error-bg text-error'">
+                {{ a.acceso.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            } @else {
+              <span class="px-2 py-0.5 bg-cream-tan/30 text-brown-muted/60 text-[10px] rounded-full">Sin acceso</span>
+            }
+          </div>
+        </div>
+
+        <!-- Ver visitas -->
+        <button (click)="verVisitas(a.id)"
+          class="flex-shrink-0 w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center
+                 hover:bg-gold/20 active:bg-gold/30 transition-colors">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9973A" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </button>
+
+      </div>
+    }
+
+    <!-- Vacío -->
+    @if (!loading() && apicultores().length === 0 && !errorMsg()) {
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="w-16 h-16 rounded-full bg-cream-tan/30 flex items-center justify-center mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A0856A" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <p class="text-sm font-semibold text-brown">Sin apicultores orgánicos</p>
+        <p class="text-xs text-brown-muted mt-1">No se encontraron resultados</p>
+      </div>
+    }
+
+  </div>
+</div>

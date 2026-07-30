@@ -49,6 +49,25 @@ export class VisitasApiService {
     );
   }
 
+  // ── Admin ────────────────────────────────────────────────────────────────
+  private readonly adminBase = `${environment.apiUrl}/api/visitas/admin`;
+
+  adminGetApicultores(page = 1, limit = 50, search?: string): Promise<any> {
+    const params: any = { page, limit, organica: 'true' };
+    if (search) params.search = search;
+    return firstValueFrom(this.http.get<any>(`${this.adminBase}/apicultores`, { params }));
+  }
+
+  adminGetReportesApicultor(apicultorId: string, page = 1, limit = 50): Promise<any> {
+    return firstValueFrom(
+      this.http.get<any>(`${this.adminBase}/reportes`, { params: { apicultorId, page, limit } })
+    );
+  }
+
+  adminGetReporteDetalle(reporteId: string): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${this.adminBase}/reportes/${reporteId}`));
+  }
+
   // Frontend VisitData → backend SaveReporteDTO
   toApiDto(data: Partial<VisitData>): Record<string, unknown> {
     const dto: Record<string, unknown> = {};

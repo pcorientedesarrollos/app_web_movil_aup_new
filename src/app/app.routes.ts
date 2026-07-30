@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
+import { authGuard, adminGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -40,6 +40,29 @@ export const routes: Routes = [
     path: 'profile',
     loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
     canActivate: [authGuard],
+  },
+  // ── Admin ────────────────────────────────────────────────────────────────
+  {
+    path: 'admin/login',
+    loadComponent: () => import('./features/admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent),
+  },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/admin/apicultores/admin-apicultores.component').then(m => m.AdminApicultoresComponent),
+      },
+      {
+        path: 'apicultor/:id',
+        loadComponent: () => import('./features/admin/reportes/admin-reportes-apicultor.component').then(m => m.AdminReportesApicultorComponent),
+      },
+      {
+        path: 'reporte/:id',
+        loadComponent: () => import('./features/admin/reportes/admin-reporte-detalle.component').then(m => m.AdminReporteDetalleComponent),
+      },
+    ],
   },
   { path: '**', redirectTo: 'login' },
 ];

@@ -40,9 +40,9 @@
         <div>
           <p class="text-xs text-cream-tan/70 font-medium uppercase tracking-wide">Cumplimiento</p>
           <p class="text-lg font-bold mt-0.5">
-            {{ completedCount() }}<span class="text-cream-tan/60">/{{ totalMonths() }}</span>
+            {{ completedCount() }}<span class="text-cream-tan/60">/{{ totalAnual }}</span>
           </p>
-          <p class="text-xs text-cream-tan/70 mt-0.5">reportes mensuales</p>
+          <p class="text-xs text-cream-tan/70 mt-0.5">visitas anuales</p>
         </div>
         <div class="flex gap-1.5 flex-wrap justify-end max-w-[120px]">
           @for (i of [0,1,2,3,4,5,6]; track i) {
@@ -54,7 +54,7 @@
       </div>
       <div class="w-full h-1.5 bg-cream-tan/20 rounded-full overflow-hidden">
         <div class="h-full bg-gold rounded-full transition-all"
-             [style.width.%]="totalMonths() > 0 ? (completedCount() / totalMonths()) * 100 : 0"></div>
+             [style.width.%]="(completedCount() / totalAnual) * 100"></div>
       </div>
     </div>
 

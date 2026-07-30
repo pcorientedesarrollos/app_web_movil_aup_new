@@ -16,7 +16,15 @@ export interface BeekerUser {
   municipio?: string;
   estado?: string;
   direccion?: string;
+  organica: boolean;
   apiarios: Apiario[];
+}
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  nombre: string;
+  role: 'ADMINISTRADOR';
 }
 
 export interface LoginRequest {
