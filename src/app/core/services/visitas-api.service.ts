@@ -31,6 +31,16 @@ export class VisitasApiService {
     return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/mis-reportes/${id}`));
   }
 
+  crearVisita(data: { fecha: string; tipo: string; apiarios?: string[] }): Promise<any> {
+    return firstValueFrom(
+      this.http.post<any>(`${this.base}/apicultor/visitas`, {
+        fecha: data.fecha,
+        tipo: data.tipo === 'RUTINA' ? 'RUTINARIA' : data.tipo,
+        apiariosRevisados: data.apiarios ?? [],
+      })
+    );
+  }
+
   iniciarReporte(visitaId: string): Promise<any> {
     return firstValueFrom(
       this.http.post<any>(`${this.base}/apicultor/reportes`, { visitaId })

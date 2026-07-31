@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
@@ -13,11 +13,13 @@ import { OfflineService } from '../../../../../core/services/offline.service';
   templateUrl: './step-notes.component.html',
 })
 export class StepNotesComponent implements OnInit, OnDestroy {
-  private fb      = inject(FormBuilder);
-  readonly store  = inject(VisitFormStore);
+  private fb       = inject(FormBuilder);
+  readonly store   = inject(VisitFormStore);
   readonly offline = inject(OfflineService);
-  private router  = inject(Router);
-  private destroy = new Subject<void>();
+  private router   = inject(Router);
+  private destroy  = new Subject<void>();
+
+  readonly submitError = signal('');
 
   form = this.fb.group({
     notas: [this.store.formData().notas ?? ''],
@@ -39,7 +41,7 @@ export class StepNotesComponent implements OnInit, OnDestroy {
     const d = this.store.formData();
     return [
       { label: 'Fecha',       value: d.fecha       ?? '—' },
-      { label: 'Tipo',        value: d.tipo         ?? '—' },
+      { label: 'Tipo',        value: d.tipo === 'RUTINA' ? 'Rutinaria' : (d.tipo ?? '—') },
       { label: 'Colmenas',    value: String(this.store.hiveCount()) },
       { label: 'Cosecha miel',value: d.cosechaMiel  ? `${d.cosechaMielKg} kg` : 'No' },
       { label: 'Tratamiento', value: (d.tratamientoVarroa ?? []).join(', ') || 'Ninguno' },
@@ -48,16 +50,16 @@ export class StepNotesComponent implements OnInit, OnDestroy {
   }
 
   async submit(): Promise<void> {
+    this.submitError.set('');
     this.store.setSubmitting(true);
     try {
-      await this.store.enviarReporte();
-      await this.store.clearDraft();
+      const wasOffline = await this.store.enviarReporte();
+      if (!wasOffline) await this.store.clearDraft();
       this.router.navigate(['/success'], {
-        queryParams: { offline: '0' }
+        queryParams: { offline: wasOffline ? '1' : '0' }
       });
     } catch (err: any) {
-      const msg = err?.error?.error?.details ?? err?.message ?? 'Error al enviar el reporte';
-      alert(msg);
+      this.submitError.set(err?.error?.error?.details ?? err?.message ?? 'Error al enviar el reporte. Intenta de nuevo.');
     } finally {
       this.store.setSubmitting(false);
     }

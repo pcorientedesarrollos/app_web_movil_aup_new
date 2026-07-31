@@ -44,18 +44,35 @@
         </div>
       }
 
-      <!-- Data table -->
-      <div class="rounded-2xl border border-cream-tan overflow-hidden bg-cream-pure shadow-card">
-        @for (row of tableRows; track row.label) {
-          <div class="flex items-start gap-3 px-4 py-3 border-b border-cream-tan/50 last:border-0">
-            <span class="text-xs text-brown-muted w-36 flex-shrink-0 font-medium pt-0.5">{{ row.label }}</span>
-            <span class="text-xs text-brown font-mono flex-1">{{ row.value }}</span>
+      <!-- Secciones del formulario -->
+      @for (seccion of secciones; track seccion.titulo) {
+        <div class="rounded-2xl border border-cream-tan overflow-hidden bg-cream-pure shadow-card">
+          <div class="bg-brown/5 px-4 py-2.5 border-b border-cream-tan/50">
+            <h4 class="text-xs font-bold text-brown-muted uppercase tracking-wide">{{ seccion.titulo }}</h4>
           </div>
-        }
-      </div>
+          @for (fila of seccion.filas; track fila.label) {
+            <div class="flex items-start gap-3 px-4 py-3 border-b border-cream-tan/40 last:border-0">
+              <span class="text-xs text-brown-muted w-36 flex-shrink-0 font-medium pt-0.5 leading-snug">{{ fila.label }}</span>
+              <span class="text-xs text-brown font-mono flex-1 leading-snug">{{ fila.value }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Firma digital -->
+      @if (firma) {
+        <div class="rounded-2xl border border-cream-tan overflow-hidden bg-cream-pure shadow-card">
+          <div class="bg-brown/5 px-4 py-2.5 border-b border-cream-tan/50">
+            <h4 class="text-xs font-bold text-brown-muted uppercase tracking-wide">Firma del apicultor</h4>
+          </div>
+          <div class="px-4 py-3 flex justify-center">
+            <img [src]="firma" alt="Firma" class="max-h-24 object-contain rounded border border-cream-tan bg-white p-2">
+          </div>
+        </div>
+      }
 
       <!-- Admin notice -->
-      <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-cream-tan">
+      <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-cream-tan mb-4">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A7550" stroke-width="2">
           <circle cx="12" cy="12" r="10"/>
           <line x1="12" y1="8" x2="12" y2="12"/>

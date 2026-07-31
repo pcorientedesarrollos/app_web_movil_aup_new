@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { OfflineService } from '../../core/services/offline.service';
@@ -11,7 +11,7 @@ import { VisitaActivaResponse, MiReporteItem } from '../../core/models/visit.mod
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgClass, BottomNavComponent, OfflineBannerComponent],
+  imports: [NgClass, DecimalPipe, BottomNavComponent, OfflineBannerComponent],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
@@ -88,6 +88,10 @@ export class DashboardComponent implements OnInit {
     if (dias < 0)  return 'border-l-4 border-error bg-error-bg';
     if (dias <= 3) return 'border-l-4 border-gold bg-gold/10';
     return 'border border-cream-tan bg-cream-pure';
+  }
+
+  registrarNuevaVisita(): void {
+    this.router.navigate(['/form'], { queryParams: { nueva: '1' } });
   }
 
   startForm(): void {

@@ -45,8 +45,11 @@ export class FormShellComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const visitaId = this.route.snapshot.queryParams['visitaId'];
+    const nueva    = this.route.snapshot.queryParams['nueva'];
     if (visitaId) {
       await this.store.iniciarReporte(visitaId);
+    } else if (nueva === '1') {
+      await this.store.iniciarNuevaVisita();
     } else {
       await this.store.loadDraft();
     }

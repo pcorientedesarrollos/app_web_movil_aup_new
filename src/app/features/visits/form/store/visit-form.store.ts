@@ -41,6 +41,9 @@ export class VisitFormStore {
     return (d.colmenasInicial ?? 0) - (d.colmenasPerdidas ?? 0) + (d.colmenasAumentadas ?? 0);
   });
 
+  private _isNuevaVisita = signal(false);
+  readonly isNuevaVisita = this._isNuevaVisita.asReadonly();
+
   private saveTimeout:    ReturnType<typeof setTimeout> | null = null;
   private apiSaveTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -93,6 +96,14 @@ export class VisitFormStore {
     this._state.update(s => ({ ...s, isSubmitting: val }));
   }
 
+  async iniciarNuevaVisita(): Promise<void> {
+    if (this.saveTimeout)    clearTimeout(this.saveTimeout);
+    if (this.apiSaveTimeout) clearTimeout(this.apiSaveTimeout);
+    await this.draftService.deleteDraft(DRAFT_KEY);
+    this._state.set({ ...INITIAL_STATE });
+    this._isNuevaVisita.set(true);
+  }
+
   async iniciarReporte(visitaId: string): Promise<void> {
     this._state.update(s => ({ ...s, visitId: visitaId }));
     try {
@@ -114,10 +125,37 @@ export class VisitFormStore {
     }
   }
 
-  async enviarReporte(): Promise<void> {
-    const reporteId = this._state().reporteId;
+  // Returns true when saved offline (caller should NOT clear draft)
+  async enviarReporte(): Promise<boolean> {
+    let reporteId = this._state().reporteId;
+
+    // Offline + nueva visita: persist to IndexedDB only, no API calls
+    if (this._isNuevaVisita() && this.offline.isOffline()) {
+      await this.persistDraft();
+      return true;
+    }
+
+    if (this._isNuevaVisita() && !reporteId) {
+      const d = this._state().data;
+      const visitaRes = await this.visitas.crearVisita({
+        fecha: d.fecha ?? new Date().toISOString().split('T')[0],
+        tipo: d.tipo ?? 'RUTINA',
+        apiarios: d.apiarios,
+      });
+      const visitaId = visitaRes?.data?.visitaId ?? visitaRes?.data?.id;
+      if (!visitaId) throw new Error('No se pudo crear la visita');
+
+      const reporteRes = await this.visitas.iniciarReporte(visitaId);
+      reporteId = reporteRes?.data?.id;
+      if (!reporteId) throw new Error('No se pudo iniciar el reporte');
+
+      this._state.update(s => ({ ...s, visitId: visitaId, reporteId }));
+      await this.visitas.saveReporte(reporteId, this._state().data);
+    }
+
     if (!reporteId) throw new Error('Sin reporteId activo');
     await this.visitas.enviarReporte(reporteId);
+    return false;
   }
 
   async loadDraft(): Promise<void> {

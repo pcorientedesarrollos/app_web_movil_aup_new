@@ -3,6 +3,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { VisitasApiService } from '../../../core/services/visitas-api.service';
 import { VisitData } from '../../../core/models/visit.model';
 
+interface SeccionDetalle {
+  titulo: string;
+  filas: { label: string; value: string }[];
+}
+
 @Component({
   selector: 'app-admin-reporte-detalle',
   standalone: true,
@@ -46,6 +51,7 @@ export class AdminReporteDetalleComponent implements OnInit {
   get fechaVisita(): string { return this.reporte()?.fechaVisita?.split('T')[0] ?? ''; }
   get apicultorNombre(): string { return this.reporte()?.apicultor?.nombreCompleto ?? ''; }
   get observacionesInspector(): string | null { return this.reporte()?.observacionesInspector ?? null; }
+  get firma(): string | null { return this.datos?.firma ?? null; }
 
   get estadoLabel(): string {
     const map: Record<string, string> = {
@@ -65,18 +71,89 @@ export class AdminReporteDetalleComponent implements OnInit {
     return map[this.estado] ?? 'bg-cream-tan text-brown-muted';
   }
 
-  get tableRows(): { label: string; value: string }[] {
+  get secciones(): SeccionDetalle[] {
     const d = this.datos;
     if (!d) return [];
     return [
-      { label: 'Tipo de visita',     value: d.tipo === 'RUTINA' ? 'Rutinaria' : 'Inspección' },
-      { label: 'Colmenas iniciales', value: String(d.colmenasInicial ?? '—') },
-      { label: 'Bajas / Altas',      value: `${d.colmenasPerdidas ?? 0} / ${d.colmenasAumentadas ?? 0}` },
-      { label: 'Total colmenas',     value: String((d.colmenasInicial ?? 0) - (d.colmenasPerdidas ?? 0) + (d.colmenasAumentadas ?? 0)) },
-      { label: 'Tratamiento varroa', value: (d.tratamientoVarroa ?? []).join(', ') || 'Ninguno' },
-      { label: 'Miel cosechada',     value: d.cosechaMiel ? `${d.cosechaMielKg} kg` : 'No' },
-      { label: 'Cera (láminas)',     value: String(d.ceraLaminas ?? '—') },
-      { label: 'Notas',              value: d.notas || '—' },
+      {
+        titulo: 'Datos de la visita',
+        filas: [
+          { label: 'Tipo de visita',     value: d.tipo === 'RUTINA' ? 'Rutinaria' : (d.tipo ? 'Inspección' : '—') },
+          { label: 'Apiarios revisados', value: (d.apiarios ?? []).join(', ') || '—' },
+        ],
+      },
+      {
+        titulo: 'Colmenas',
+        filas: [
+          { label: 'Colmenas iniciales', value: String(d.colmenasInicial ?? '—') },
+          { label: 'Bajas',              value: String(d.colmenasPerdidas ?? 0) },
+          { label: 'Altas',              value: String(d.colmenasAumentadas ?? 0) },
+          { label: 'Total final',        value: String((d.colmenasInicial ?? 0) - (d.colmenasPerdidas ?? 0) + (d.colmenasAumentadas ?? 0)) },
+          { label: 'Muerte/Enjambrazon', value: d.causasMuerteEnjambre != null ? String(d.causasMuerteEnjambre) : '—' },
+          { label: 'Traslados',          value: d.causasTraslado != null ? String(d.causasTraslado) : '—' },
+          { label: 'Divisiones',         value: d.causasDivisiones != null ? String(d.causasDivisiones) : '—' },
+          { label: 'Núcleos',            value: d.causasNucleos != null ? String(d.causasNucleos) : '—' },
+        ],
+      },
+      {
+        titulo: 'Mantenimiento',
+        filas: [
+          { label: 'Apiario',     value: (d.mantenimientoApiario ?? []).join(', ') || 'Ninguno' },
+          { label: 'Equipo',      value: (d.mantenimientoEquipo ?? []).join(', ') || 'Ninguno' },
+          { label: 'Descripción', value: d.mantenimientoOtroDesc || '—' },
+        ],
+      },
+      {
+        titulo: 'Alimentación',
+        filas: [
+          { label: 'Tipo alimento',  value: d.tipoAlimento || '—' },
+          { label: 'Cantidad',       value: d.cantidadAlimento != null ? `${d.cantidadAlimento} kg` : '—' },
+          { label: 'Origen miel',    value: d.origenMiel === 'PROPIA' ? 'Propia' : d.origenMiel === 'EXTERNA' ? 'Externa / Comprada' : '—' },
+          { label: 'Marcos reserva', value: d.marcosReserva === 'MAS_4' ? 'Más de 4' : d.marcosReserva === 'MENOS_4' ? 'Menos de 4' : '—' },
+        ],
+      },
+      {
+        titulo: 'Tratamiento Varroa',
+        filas: [
+          { label: 'Tratamientos', value: (d.tratamientoVarroa ?? []).join(', ') || 'Ninguno' },
+          { label: 'Dosis',        value: d.dosisVarroa || '—' },
+        ],
+      },
+      {
+        titulo: 'Control de Plagas',
+        filas: [
+          { label: 'Plagas detectadas', value: (d.plagasDetectadas ?? []).join(', ') || 'Ninguna' },
+          { label: 'Método control',    value: d.metodoControl || '—' },
+        ],
+      },
+      {
+        titulo: 'Cera',
+        filas: [
+          { label: 'Láminas de cera',      value: d.ceraLaminas != null ? String(d.ceraLaminas) : '—' },
+          { label: 'Origen cera',          value: d.origenCera || '—' },
+          { label: 'Marcos identificados', value: d.marcosIdentificados != null ? String(d.marcosIdentificados) : '—' },
+        ],
+      },
+      {
+        titulo: 'Reinas',
+        filas: [
+          { label: 'Reinas reemplazadas', value: d.reinasReemplazadas != null ? String(d.reinasReemplazadas) : '—' },
+          { label: 'Origen reina',        value: d.origenReina || '—' },
+        ],
+      },
+      {
+        titulo: 'Cosecha',
+        filas: [
+          { label: 'Cosecha miel', value: d.cosechaMiel ? `Sí — ${d.cosechaMielKg ?? 0} kg` : 'No' },
+          { label: 'Cosecha cera', value: d.cosechaCera ? `Sí — ${d.cosechaCeraKg ?? 0} kg` : 'No' },
+        ],
+      },
+      {
+        titulo: 'Notas',
+        filas: [
+          { label: 'Observaciones', value: d.notas || 'Sin observaciones' },
+        ],
+      },
     ];
   }
 }
