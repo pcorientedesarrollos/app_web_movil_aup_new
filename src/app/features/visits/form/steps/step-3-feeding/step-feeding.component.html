@@ -37,9 +37,9 @@
   </div>
 
   <div>
-    <label class="form-label">Marcos de reserva de miel en colmenas</label>
+    <label class="form-label">Cuadros de reserva de miel en colmenas</label>
     <div class="grid grid-cols-2 gap-3 mt-1">
-      @for (opt of [{v:'MAS_4', l:'+4 marcos'},{v:'MENOS_4', l:'−4 marcos'}]; track opt.v) {
+      @for (opt of [{v:'MAS_4', l:'+4'},{v:'MENOS_4', l:'−4'}]; track opt.v) {
         <label class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
                [class]="form.get('marcosReserva')!.value === opt.v
                  ? 'border-gold bg-gold/10' : 'border-cream-tan bg-cream-pure'">

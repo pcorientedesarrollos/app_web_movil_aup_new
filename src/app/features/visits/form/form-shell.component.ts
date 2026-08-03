@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VisitFormStore } from './store/visit-form.store';
 import { StepVisitDataComponent }  from './steps/step-0-visit-data/step-visit-data.component';
 import { StepHiveCountComponent }  from './steps/step-1-hive-count/step-hive-count.component';
@@ -24,6 +24,7 @@ import { StepNotesComponent }      from './steps/step-9-notes/step-notes.compone
 })
 export class FormShellComponent implements OnInit {
   private route  = inject(ActivatedRoute);
+  private router = inject(Router);
   readonly store = inject(VisitFormStore);
 
   readonly STEP_TITLES = [
@@ -41,6 +42,14 @@ export class FormShellComponent implements OnInit {
 
   get stepTitle(): string {
     return this.STEP_TITLES[this.store.currentStep()];
+  }
+
+  goBack(): void {
+    if (this.store.currentStep() === 0) {
+      this.router.navigate(['/visits']);
+    } else {
+      this.store.prevStep();
+    }
   }
 
   async ngOnInit(): Promise<void> {
