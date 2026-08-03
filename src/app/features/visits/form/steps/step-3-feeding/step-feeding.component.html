@@ -1,13 +1,13 @@
 <form [formGroup]="form" class="flex flex-col gap-5">
 
   <div>
-    <label class="form-label">¿Qué se alimentó?</label>
+    <label class="form-label">¿Con qué se alimentó?</label>
     <input type="text" formControlName="tipoAlimento"
            placeholder="Ej. jarabe de azúcar, torta proteínica..." class="form-input">
   </div>
 
   <div>
-    <label class="form-label">Cantidad (kg o litros)</label>
+    <label class="form-label">Cantidad</label>
     <input type="number" formControlName="cantidadAlimento" min="0" step="0.1" class="form-input">
   </div>
 

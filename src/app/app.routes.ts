@@ -31,6 +31,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/visits/history/visit-history.component').then(m => m.VisitHistoryComponent),
       },
       {
+        path: 'apiary/:id',
+        loadComponent: () => import('./features/visits/apiary-visits/apiary-visits.component').then(m => m.ApiaryVisitsComponent),
+      },
+      {
         path: ':id',
         loadComponent: () => import('./features/visits/detail/visit-detail.component').then(m => m.VisitDetailComponent),
       },

@@ -2,8 +2,8 @@
 
   <!-- Header -->
   <div class="bg-cream-pure px-5 pt-5 pb-4 border-b border-cream-tan">
-    <h2 class="text-lg font-bold text-brown">Mis Visitas</h2>
-    <p class="text-sm text-brown-muted mt-0.5">Historial de reportes enviados</p>
+    <h2 class="text-lg font-bold text-brown">Mis Apiarios</h2>
+    <p class="text-sm text-brown-muted mt-0.5">Visitas registradas este año</p>
   </div>
 
   <!-- List -->
@@ -15,36 +15,51 @@
       </div>
     }
 
-    @for (r of reportes(); track r.id) {
-      <a [routerLink]="['/visits', r.id]"
-         class="card flex items-center gap-4 active:opacity-80 transition-opacity">
-        <!-- Month diamond -->
-        <div class="w-12 h-12 rounded-xl bg-gold/15 flex flex-col items-center justify-center flex-shrink-0">
-          <span class="font-bold text-gold text-xs uppercase leading-none">{{ mesCorto(r.fechaVisita) }}</span>
-          <span class="font-mono text-[10px] text-brown-muted">{{ anio(r.fechaVisita) }}</span>
+    @for (a of apiarios(); track a.id) {
+      <div (click)="openApiario(a.id, a.nombre)"
+           class="card flex flex-col gap-3 active:opacity-80 transition-opacity cursor-pointer">
+
+        <!-- Top row -->
+        <div class="flex items-center gap-3">
+          <!-- Hive icon -->
+          <div class="w-11 h-11 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C09A50" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-brown truncate">{{ a.nombre }}</p>
+            <p class="text-xs text-brown-muted mt-0.5">{{ a.colmenas }} colmenas</p>
+          </div>
+
+          <!-- Counter + arrow -->
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-sm font-bold text-gold">{{ a.visitasAnio }}<span class="text-xs text-brown-muted font-normal">/24</span></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8916A" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
         </div>
 
-        <!-- Info -->
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-brown truncate">{{ mesCompleto(r.fechaVisita) }}</p>
-          <p class="text-xs text-brown-muted mt-0.5">
-            {{ r.fechaVisita ?? r.createdAt | date:'d MMM yyyy' }} · {{ tipoLabel(r.tipoVisitaApicultor) }}
-          </p>
-          <span class="status-badge mt-1.5" [ngClass]="getStatusConfig(r.estado).cls">
-            {{ getStatusConfig(r.estado).label }}
-          </span>
+        <!-- Progress bar -->
+        <div class="h-1.5 rounded-full bg-cream-tan overflow-hidden">
+          <div class="h-full rounded-full bg-gold transition-all"
+               [style.width.%]="progressPct(a.visitasAnio)"></div>
         </div>
 
-        <!-- Arrow -->
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8916A" stroke-width="2" class="flex-shrink-0">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </a>
+        <p class="text-[10px] text-brown-muted">
+          {{ a.visitasAnio }} de 24 visitas este año
+        </p>
+      </div>
     }
 
-    @if (!loading() && reportes().length === 0) {
+    @if (!loading() && apiarios().length === 0) {
       <div class="flex flex-col items-center justify-center py-16 text-center">
-        <p class="text-sm text-brown-muted">Aún no tienes visitas registradas</p>
+        <p class="text-sm text-brown-muted">No tienes apiarios registrados</p>
       </div>
     }
   </div>

@@ -38,7 +38,7 @@ export class VisitFormStore {
 
   readonly hiveCount = computed(() => {
     const d = this._state().data;
-    return (d.colmenasInicial ?? 0) - (d.colmenasPerdidas ?? 0) + (d.colmenasAumentadas ?? 0);
+    return (d.colmenasInicial ?? 0) + (d.causasDivisiones ?? 0) + (d.causasNucleos ?? 0);
   });
 
   private _isNuevaVisita = signal(false);
@@ -140,7 +140,7 @@ export class VisitFormStore {
       const visitaRes = await this.visitas.crearVisita({
         fecha: d.fecha ?? new Date().toISOString().split('T')[0],
         tipo: d.tipo ?? 'RUTINA',
-        apiarios: d.apiarios,
+        apiarioId: d.apiarioId,
       });
       const visitaId = visitaRes?.data?.visitaId ?? visitaRes?.data?.id;
       if (!visitaId) throw new Error('No se pudo crear la visita');

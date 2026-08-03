@@ -14,7 +14,7 @@ export class StepPestControlComponent implements OnInit, OnDestroy {
   readonly store  = inject(VisitFormStore);
   private destroy = new Subject<void>();
 
-  readonly pests = ['Xulab (Metarhizium)', 'PEC (Pequeño escarabajo de la colmena)', 'Polilla de la cera'];
+  readonly pests = ['Xulab', 'PEC', 'Polilla'];
 
   form = this.fb.group({
     plagasDetectadas: [this.store.formData().plagasDetectadas ?? [] as string[]],

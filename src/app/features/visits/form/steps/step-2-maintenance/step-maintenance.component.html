@@ -1,7 +1,7 @@
 <form [formGroup]="form" class="flex flex-col gap-5">
 
   <div>
-    <label class="form-label">Mantenimiento del Apiario</label>
+    <label class="form-label">Limpieza y mantenimiento de apiario</label>
     <div class="flex flex-col gap-2 mt-1">
       @for (opt of apiarioOpts; track opt) {
         <label (click)="toggle('mantenimientoApiario', opt)"
@@ -21,7 +21,7 @@
   </div>
 
   <div>
-    <label class="form-label">Mantenimiento de Equipo</label>
+    <label class="form-label">Limpieza y mantenimiento de equipo</label>
     <div class="grid grid-cols-2 gap-2 mt-1">
       @for (opt of equipoOpts; track opt) {
         <label (click)="toggle('mantenimientoEquipo', opt)"
@@ -40,7 +40,7 @@
     </div>
     @if (showOtroDesc) {
       <div class="mt-3">
-        <label class="form-label">Describe el otro mantenimiento</label>
+        <label class="form-label">Descripción</label>
         <input type="text" formControlName="mantenimientoOtroDesc"
                placeholder="Descripción..." class="form-input mt-1">
       </div>

@@ -24,27 +24,25 @@ export class StepVisitDataComponent implements OnInit, OnDestroy {
   );
 
   form = this.fb.group({
-    fecha:    [this.store.formData().fecha    ?? this.todayStr()],
-    tipo:     [this.store.formData().tipo     ?? 'RUTINA'],
-    apiarios: [this.store.formData().apiarios ?? [] as string[]],
+    fecha:     [this.store.formData().fecha     ?? this.todayStr()],
+    tipo:      [this.store.formData().tipo      ?? 'RUTINA'],
+    apiarioId: [this.store.formData().apiarioId ?? ''],
   });
 
   ngOnInit(): void {
     this.form.valueChanges.pipe(debounceTime(400), takeUntil(this.destroy)).subscribe(v => {
-      this.store.patchData({ fecha: v.fecha!, tipo: v.tipo as any, apiarios: v.apiarios! });
+      this.store.patchData({ fecha: v.fecha!, tipo: v.tipo as any, apiarioId: v.apiarioId! });
     });
   }
 
   ngOnDestroy(): void { this.destroy.next(); this.destroy.complete(); }
 
-  toggleApiary(id: string): void {
-    const current: string[] = this.form.get('apiarios')!.value ?? [];
-    const updated = current.includes(id) ? current.filter(a => a !== id) : [...current, id];
-    this.form.get('apiarios')!.setValue(updated);
+  selectApiary(id: string): void {
+    this.form.get('apiarioId')!.setValue(id);
   }
 
   isApiarySelected(id: string): boolean {
-    return (this.form.get('apiarios')!.value ?? []).includes(id);
+    return this.form.get('apiarioId')!.value === id;
   }
 
   private todayStr(): string {

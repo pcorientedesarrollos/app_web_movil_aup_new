@@ -1,7 +1,7 @@
 <form [formGroup]="form" class="flex flex-col gap-5">
 
   <div>
-    <label class="form-label">Plagas detectadas</label>
+    <label class="form-label">Control de plagas</label>
     <div class="flex flex-col gap-2 mt-1">
       @for (pest of pests; track pest) {
         <label (click)="toggle(pest)"
@@ -20,7 +20,7 @@
   </div>
 
   <div>
-    <label class="form-label">Método de control aplicado</label>
+    <label class="form-label">Control</label>
     <input type="text" formControlName="metodoControl"
            placeholder="Describe el método utilizado..." class="form-input">
   </div>

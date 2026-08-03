@@ -1,35 +1,42 @@
 <form [formGroup]="form" class="flex flex-col gap-5">
 
-  <!-- Main counts -->
-  <div class="grid grid-cols-3 gap-3">
-    @for (field of [
-      {ctrl:'colmenasInicial', label:'Colmenas anteriores'},
-      {ctrl:'colmenasPerdidas', label:'Bajas'},
-      {ctrl:'colmenasAumentadas', label:'Altas'}
-    ]; track field.ctrl) {
-      <div>
-        <label class="form-label text-center block">{{ field.label }}</label>
-        <input type="number" [formControlName]="field.ctrl" min="0"
-               class="form-input text-center text-lg font-bold">
-      </div>
-    }
-  </div>
-
-  <!-- Calculated total -->
-  <div class="rounded-2xl bg-brown-light p-4 text-center">
-    <p class="text-xs text-cream-tan/60 font-medium uppercase tracking-wide mb-1">Total actual de colmenas</p>
-    <p class="text-4xl font-bold text-cream-pure">{{ store.hiveCount() }}</p>
-  </div>
-
-  <!-- Causes grid -->
+  <!-- Colmenas anteriores -->
   <div>
-    <p class="form-label mb-3">Causas de movimiento</p>
+    <label class="form-label">Colmenas que se dejaron en la última visita</label>
+    <input type="number" formControlName="colmenasInicial" min="0"
+           class="form-input text-center text-lg font-bold mt-1">
+  </div>
+
+  <!-- Pérdida de colmenas (título + checkboxes) -->
+  <div>
+    <p class="form-label mb-3">Pérdida de colmenas</p>
+    <div class="flex flex-col gap-2">
+      @for (item of [
+        {ctrl:'causasMuerteEnjambre', label:'Muerte/Enjambre'},
+        {ctrl:'causasTraslado',       label:'Traslado'}
+      ]; track item.ctrl) {
+        <label (click)="toggle(item.ctrl === 'causasMuerteEnjambre' ? 'causasMuerteEnjambre' : 'causasTraslado')"
+               class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
+               [class]="isChecked(item.ctrl) ? 'border-gold bg-gold/10' : 'border-cream-tan bg-cream-pure'">
+          <div class="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0"
+               [class]="isChecked(item.ctrl) ? 'border-gold bg-gold' : 'border-brown-muted/30'">
+            @if (isChecked(item.ctrl)) {
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+            }
+          </div>
+          <span class="text-sm text-brown">{{ item.label }}</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <!-- Incremento de colmenas -->
+  <div>
+    <p class="form-label mb-3">Incremento de colmenas</p>
     <div class="grid grid-cols-2 gap-3">
       @for (field of [
-        {ctrl:'causasMuerteEnjambre', label:'Muerte / Enjambrazón'},
-        {ctrl:'causasTraslado', label:'Traslado'},
         {ctrl:'causasDivisiones', label:'Divisiones'},
-        {ctrl:'causasNucleos', label:'Núcleos'}
+        {ctrl:'causasNucleos',    label:'Núcleos'}
       ]; track field.ctrl) {
         <div class="card p-3">
           <label class="form-label">{{ field.label }}</label>
@@ -37,6 +44,12 @@
         </div>
       }
     </div>
+  </div>
+
+  <!-- Total calculado -->
+  <div class="rounded-2xl bg-brown-light p-4 text-center">
+    <p class="text-xs text-cream-tan/60 font-medium uppercase tracking-wide mb-1">Colmenas al final de esta visita</p>
+    <p class="text-4xl font-bold text-cream-pure">{{ store.hiveCount() }}</p>
   </div>
 
   <button type="button" (click)="store.nextStep()" class="btn-primary">Continuar</button>

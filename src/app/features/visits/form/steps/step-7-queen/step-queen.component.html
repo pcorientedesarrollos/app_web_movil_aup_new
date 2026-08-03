@@ -1,7 +1,7 @@
 <form [formGroup]="form" class="flex flex-col gap-5">
 
   <div>
-    <label class="form-label">Número de reinas introducidas</label>
+    <label class="form-label">Número de Reinas introducidas</label>
     <input type="number" formControlName="reinasReemplazadas" min="0" class="form-input">
   </div>
 
@@ -9,9 +9,9 @@
     <label class="form-label">Origen de la reina</label>
     <div class="flex flex-col gap-2 mt-1">
       @for (opt of [
-        {v:'PROPIA', l:'Propia (crianza propia)', desc:''},
-        {v:'COMPRADA', l:'Comprada', desc:'Se requiere factura'},
-        {v:'CACAHUATERA', l:'Reina cacahuatera', desc:'Celda real sin criar'}
+        {v:'PROPIA', l:'Propias', desc:''},
+        {v:'COMPRADA', l:'Compradas', desc:''},
+        {v:'CACAHUATERA', l:'Cacahuate', desc:''}
       ]; track opt.v) {
         <label class="flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
                [class]="form.get('origenReina')!.value === opt.v

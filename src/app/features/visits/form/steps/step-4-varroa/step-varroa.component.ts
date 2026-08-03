@@ -14,7 +14,7 @@ export class StepVarroaComponent implements OnInit, OnDestroy {
   readonly store  = inject(VisitFormStore);
   private destroy = new Subject<void>();
 
-  readonly treatments = ['Timol', 'Ácido oxálico', 'Ácido fórmico', 'Corte de cría de zángano'];
+  readonly treatments = ['Timol', 'Ácido Oxálico', 'Ácido Fórmico', 'Corte de Panal de Zánganos'];
 
   form = this.fb.group({
     tratamientoVarroa: [this.store.formData().tratamientoVarroa ?? [] as string[]],

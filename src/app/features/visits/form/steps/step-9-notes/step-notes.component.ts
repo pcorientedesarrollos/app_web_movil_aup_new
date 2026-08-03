@@ -45,7 +45,7 @@ export class StepNotesComponent implements OnInit, OnDestroy {
       { label: 'Colmenas',    value: String(this.store.hiveCount()) },
       { label: 'Cosecha miel',value: d.cosechaMiel  ? `${d.cosechaMielKg} kg` : 'No' },
       { label: 'Tratamiento', value: (d.tratamientoVarroa ?? []).join(', ') || 'Ninguno' },
-      { label: 'Apiario',     value: (d.apiarios ?? []).join(', ') || '—' },
+      { label: 'Apiario',     value: d.apiarioId ?? '—' },
     ];
   }
 

@@ -14,8 +14,8 @@ export class StepMaintenanceComponent implements OnInit, OnDestroy {
   readonly store  = inject(VisitFormStore);
   private destroy = new Subject<void>();
 
-  readonly apiarioOpts = ['Desyerbe', 'Recolección de basura', 'Agua'];
-  readonly equipoOpts  = ['Herramientas', 'Banca', 'Extractor', 'Otro'];
+  readonly apiarioOpts = ['Chapeo', 'Recolección de basura', 'Agua'];
+  readonly equipoOpts  = ['Utensilios', 'Banco', 'Extractor', 'Otros'];
 
   form = this.fb.group({
     mantenimientoApiario: [this.store.formData().mantenimientoApiario ?? [] as string[]],
@@ -46,6 +46,6 @@ export class StepMaintenanceComponent implements OnInit, OnDestroy {
   }
 
   get showOtroDesc(): boolean {
-    return this.isChecked('mantenimientoEquipo', 'Otro');
+    return this.isChecked('mantenimientoEquipo', 'Otros');
   }
 }

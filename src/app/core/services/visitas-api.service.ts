@@ -31,14 +31,22 @@ export class VisitasApiService {
     return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/mis-reportes/${id}`));
   }
 
-  crearVisita(data: { fecha: string; tipo: string; apiarios?: string[] }): Promise<any> {
+  crearVisita(data: { fecha: string; tipo: string; apiarioId?: string }): Promise<any> {
     return firstValueFrom(
       this.http.post<any>(`${this.base}/apicultor/visitas`, {
         fecha: data.fecha,
         tipo: data.tipo === 'RUTINA' ? 'RUTINARIA' : data.tipo,
-        apiariosRevisados: data.apiarios ?? [],
+        apiarioId: data.apiarioId ?? null,
       })
     );
+  }
+
+  getMisApiarios(): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/mis-apiarios`));
+  }
+
+  getVisitasApiario(apiarioId: string): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/apiarios/${apiarioId}/visitas`));
   }
 
   iniciarReporte(visitaId: string): Promise<any> {
@@ -86,26 +94,24 @@ export class VisitasApiService {
     if (data.tipo !== undefined) {
       dto['tipoVisitaApicultor'] = data.tipo === 'RUTINA' ? 'RUTINARIA' : data.tipo;
     }
-    if (data.apiarios !== undefined) dto['apiariosRevisados'] = data.apiarios;
+    if (data.apiarioId !== undefined) dto['apiarioId'] = data.apiarioId;
 
     if (data.colmenasInicial !== undefined) dto['colmenasAnteriores'] = data.colmenasInicial;
-    if (data.colmenasPerdidas !== undefined) dto['bajas'] = data.colmenasPerdidas;
-    if (data.colmenasAumentadas !== undefined) dto['altas'] = data.colmenasAumentadas;
-    if (data.causasMuerteEnjambre !== undefined) dto['muerteEnjambrazon'] = data.causasMuerteEnjambre;
-    if (data.causasTraslado !== undefined) dto['traslado'] = data.causasTraslado;
+    if (data.causasMuerteEnjambre !== undefined) dto['muerteEnjambrazon'] = data.causasMuerteEnjambre ? 1 : 0;
+    if (data.causasTraslado !== undefined) dto['traslado'] = data.causasTraslado ? 1 : 0;
     if (data.causasDivisiones !== undefined) dto['divisiones'] = data.causasDivisiones;
     if (data.causasNucleos !== undefined) dto['nucleos'] = data.causasNucleos;
 
     if (data.mantenimientoApiario !== undefined) {
-      dto['desyerbe'] = data.mantenimientoApiario.includes('Desyerbe');
+      dto['desyerbe'] = data.mantenimientoApiario.includes('Chapeo');
       dto['recoleccionBasura'] = data.mantenimientoApiario.includes('Recolección de basura');
       dto['agua'] = data.mantenimientoApiario.includes('Agua');
     }
     if (data.mantenimientoEquipo !== undefined) {
-      dto['herramientas'] = data.mantenimientoEquipo.includes('Herramientas');
-      dto['banca'] = data.mantenimientoEquipo.includes('Banca');
+      dto['herramientas'] = data.mantenimientoEquipo.includes('Utensilios');
+      dto['banca'] = data.mantenimientoEquipo.includes('Banco');
       dto['extractor'] = data.mantenimientoEquipo.includes('Extractor');
-      dto['otroMantenimiento'] = data.mantenimientoEquipo.includes('Otro');
+      dto['otroMantenimiento'] = data.mantenimientoEquipo.includes('Otros');
     }
     if (data.mantenimientoOtroDesc !== undefined) dto['otroMantenimientoDesc'] = data.mantenimientoOtroDesc;
 
@@ -118,16 +124,16 @@ export class VisitasApiService {
 
     if (data.tratamientoVarroa !== undefined) {
       dto['varroaTimol'] = data.tratamientoVarroa.includes('Timol');
-      dto['varroaAcidoOxalico'] = data.tratamientoVarroa.includes('Ácido oxálico');
-      dto['varroaAcidoFormico'] = data.tratamientoVarroa.includes('Ácido fórmico');
-      dto['varroaCorteCria'] = data.tratamientoVarroa.includes('Corte de cría de zángano');
+      dto['varroaAcidoOxalico'] = data.tratamientoVarroa.includes('Ácido Oxálico');
+      dto['varroaAcidoFormico'] = data.tratamientoVarroa.includes('Ácido Fórmico');
+      dto['varroaCorteCria'] = data.tratamientoVarroa.includes('Corte de Panal de Zánganos');
     }
     if (data.dosisVarroa !== undefined) dto['varroaDosis'] = data.dosisVarroa;
 
     if (data.plagasDetectadas !== undefined) {
-      dto['plagaXulab'] = data.plagasDetectadas.includes('Xulab (Metarhizium)');
+      dto['plagaXulab'] = data.plagasDetectadas.includes('Xulab');
       dto['plagaPec'] = data.plagasDetectadas.includes('PEC');
-      dto['plagaPolilla'] = data.plagasDetectadas.includes('Polilla de la cera');
+      dto['plagaPolilla'] = data.plagasDetectadas.includes('Polilla');
     }
     if (data.metodoControl !== undefined) dto['plagasMetodo'] = data.metodoControl;
 
@@ -157,29 +163,27 @@ export class VisitasApiService {
 
     if (r.fechaVisita) d.fecha = r.fechaVisita.split('T')[0];
     if (r.tipoVisitaApicultor) d.tipo = r.tipoVisitaApicultor === 'RUTINARIA' ? 'RUTINA' : 'INSPECCION';
-    if (r.apiariosRevisados) d.apiarios = r.apiariosRevisados;
+    if (r.apiarioId) d.apiarioId = r.apiarioId;
 
     if (r.colmenasAnteriores != null) d.colmenasInicial = r.colmenasAnteriores;
-    if (r.bajas != null) d.colmenasPerdidas = r.bajas;
-    if (r.altas != null) d.colmenasAumentadas = r.altas;
-    if (r.muerteEnjambrazon != null) d.causasMuerteEnjambre = r.muerteEnjambrazon;
-    if (r.traslado != null) d.causasTraslado = r.traslado;
+    if (r.muerteEnjambrazon != null) d.causasMuerteEnjambre = !!r.muerteEnjambrazon;
+    if (r.traslado != null) d.causasTraslado = !!r.traslado;
     if (r.divisiones != null) d.causasDivisiones = r.divisiones;
     if (r.nucleos != null) d.causasNucleos = r.nucleos;
 
     if (r.desyerbe != null) {
       const a: string[] = [];
-      if (r.desyerbe) a.push('Desyerbe');
+      if (r.desyerbe) a.push('Chapeo');
       if (r.recoleccionBasura) a.push('Recolección de basura');
       if (r.agua) a.push('Agua');
       d.mantenimientoApiario = a;
     }
     if (r.herramientas != null) {
       const e: string[] = [];
-      if (r.herramientas) e.push('Herramientas');
-      if (r.banca) e.push('Banca');
+      if (r.herramientas) e.push('Utensilios');
+      if (r.banca) e.push('Banco');
       if (r.extractor) e.push('Extractor');
-      if (r.otroMantenimiento) e.push('Otro');
+      if (r.otroMantenimiento) e.push('Otros');
       d.mantenimientoEquipo = e;
     }
     if (r.otroMantenimientoDesc) d.mantenimientoOtroDesc = r.otroMantenimientoDesc;
@@ -192,18 +196,18 @@ export class VisitasApiService {
     if (r.varroaTimol != null) {
       const v: string[] = [];
       if (r.varroaTimol) v.push('Timol');
-      if (r.varroaAcidoOxalico) v.push('Ácido oxálico');
-      if (r.varroaAcidoFormico) v.push('Ácido fórmico');
-      if (r.varroaCorteCria) v.push('Corte de cría de zángano');
+      if (r.varroaAcidoOxalico) v.push('Ácido Oxálico');
+      if (r.varroaAcidoFormico) v.push('Ácido Fórmico');
+      if (r.varroaCorteCria) v.push('Corte de Panal de Zánganos');
       d.tratamientoVarroa = v;
     }
     if (r.varroaDosis) d.dosisVarroa = r.varroaDosis;
 
     if (r.plagaXulab != null) {
       const p: string[] = [];
-      if (r.plagaXulab) p.push('Xulab (Metarhizium)');
+      if (r.plagaXulab) p.push('Xulab');
       if (r.plagaPec) p.push('PEC');
-      if (r.plagaPolilla) p.push('Polilla de la cera');
+      if (r.plagaPolilla) p.push('Polilla');
       d.plagasDetectadas = p;
     }
     if (r.plagasMetodo) d.metodoControl = r.plagasMetodo;

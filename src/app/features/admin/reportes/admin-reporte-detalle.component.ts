@@ -79,18 +79,16 @@ export class AdminReporteDetalleComponent implements OnInit {
         titulo: 'Datos de la visita',
         filas: [
           { label: 'Tipo de visita',     value: d.tipo === 'RUTINA' ? 'Rutinaria' : (d.tipo ? 'Inspección' : '—') },
-          { label: 'Apiarios revisados', value: (d.apiarios ?? []).join(', ') || '—' },
+          { label: 'Apiario', value: d.apiarioId ?? '—' },
         ],
       },
       {
         titulo: 'Colmenas',
         filas: [
           { label: 'Colmenas iniciales', value: String(d.colmenasInicial ?? '—') },
-          { label: 'Bajas',              value: String(d.colmenasPerdidas ?? 0) },
-          { label: 'Altas',              value: String(d.colmenasAumentadas ?? 0) },
-          { label: 'Total final',        value: String((d.colmenasInicial ?? 0) - (d.colmenasPerdidas ?? 0) + (d.colmenasAumentadas ?? 0)) },
-          { label: 'Muerte/Enjambrazon', value: d.causasMuerteEnjambre != null ? String(d.causasMuerteEnjambre) : '—' },
-          { label: 'Traslados',          value: d.causasTraslado != null ? String(d.causasTraslado) : '—' },
+          { label: 'Total final',        value: String((d.colmenasInicial ?? 0) + (d.causasDivisiones ?? 0) + (d.causasNucleos ?? 0)) },
+          { label: 'Muerte/Enjambre',    value: d.causasMuerteEnjambre ? 'Sí' : 'No' },
+          { label: 'Traslado',           value: d.causasTraslado ? 'Sí' : 'No' },
           { label: 'Divisiones',         value: d.causasDivisiones != null ? String(d.causasDivisiones) : '—' },
           { label: 'Núcleos',            value: d.causasNucleos != null ? String(d.causasNucleos) : '—' },
         ],

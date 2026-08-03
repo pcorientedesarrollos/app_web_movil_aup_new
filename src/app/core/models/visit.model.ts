@@ -49,16 +49,30 @@ export interface MiReporteItem {
   createdAt: string;
 }
 
+export interface MiApiarioItem {
+  id: string;
+  nombre: string;
+  colmenas: number;
+  visitasAnio: number;
+}
+
+export interface VisitaDeApiario {
+  visitaId: string;
+  reporteId: string | null;
+  fecha: string;
+  tipo: 'RUTINARIA' | 'INSPECCION' | string;
+  estado: string;
+  apiarioNombre: string;
+}
+
 export interface VisitData {
   fecha: string;
   tipo: VisitType;
-  apiarios: string[];
+  apiarioId: string;
   colmenasInicial: number;
-  colmenasPerdidas: number;
-  colmenasAumentadas: number;
   colmenasFinal: number;
-  causasMuerteEnjambre: number;
-  causasTraslado: number;
+  causasMuerteEnjambre: boolean;
+  causasTraslado: boolean;
   causasDivisiones: number;
   causasNucleos: number;
   mantenimientoApiario: string[];

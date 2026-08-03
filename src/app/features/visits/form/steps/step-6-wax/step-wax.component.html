@@ -1,14 +1,14 @@
 <form [formGroup]="form" class="flex flex-col gap-5">
 
   <div>
-    <label class="form-label">Número de láminas de cera</label>
+    <label class="form-label">Número de hojas</label>
     <input type="number" formControlName="ceraLaminas" min="0" class="form-input">
   </div>
 
   <div>
     <label class="form-label">Origen de la cera</label>
     <div class="grid grid-cols-2 gap-3 mt-1">
-      @for (opt of [{v:'COMPRADA', l:'Comprada'},{v:'MAQUINA', l:'Máquina propia'}]; track opt.v) {
+      @for (opt of [{v:'COMPRADA', l:'Compradas'},{v:'MAQUINA', l:'Maquila'}]; track opt.v) {
         <label class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
                [class]="form.get('origenCera')!.value === opt.v
                  ? 'border-gold bg-gold/10' : 'border-cream-tan bg-cream-pure'">
@@ -24,12 +24,12 @@
       }
     </div>
     <p class="mt-2 text-xs text-brown-muted bg-cream-tan rounded-lg px-3 py-2">
-      Se requieren comprobantes de compra para cualquier origen
+      (Guardar recibo en ambos casos)
     </p>
   </div>
 
   <div>
-    <label class="form-label">¿Marcos identificados con cera nueva?</label>
+    <label class="form-label">¿Se marcaron los bastidores con cera nueva?</label>
     <div class="grid grid-cols-2 gap-3 mt-1">
       @for (opt of [{v:true, l:'Sí'},{v:false, l:'No'}]; track opt.l) {
         <label class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all"
