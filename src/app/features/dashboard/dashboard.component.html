@@ -59,9 +59,7 @@
     </div>
 
     <!-- Section title -->
-    <div class="flex items-center justify-between">
-      <h3 class="text-sm font-bold text-brown uppercase tracking-wide">Visita asignada</h3>
-    </div>
+    <h3 class="text-sm font-bold text-brown uppercase tracking-wide">Visitas pendientes</h3>
 
     <!-- Loading -->
     @if (loading()) {
@@ -70,72 +68,63 @@
       </div>
     }
 
-    <!-- Active visit card -->
-    @if (!loading() && visitaActiva()) {
-      <div class="rounded-2xl overflow-hidden shadow-card"
-           [ngClass]="getUrgencyClass(visitaActiva()!.fecha)">
-        <div class="p-4">
-          <div class="flex items-start justify-between mb-3">
-            <div>
-              <div class="flex items-center gap-2">
-                @if (diasRestantes(visitaActiva()!.fecha) < 0) {
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-error text-cream-pure text-[10px] font-bold uppercase rounded-full">
-                    <div class="w-1.5 h-1.5 rounded-full bg-cream-pure animate-pulse"></div>
-                    Vencida
-                  </span>
-                } @else if (diasRestantes(visitaActiva()!.fecha) <= 3) {
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gold text-brown text-[10px] font-bold uppercase rounded-full">
-                    Urgente
-                  </span>
+    <!-- Pending visit cards -->
+    @if (!loading()) {
+      @for (v of proximasVisitas(); track v.visitaId) {
+        <div class="rounded-2xl overflow-hidden shadow-card" [ngClass]="getUrgencyClass(v.fecha)">
+          <div class="p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  @if (diasRestantes(v.fecha) < 0) {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-error text-cream-pure text-[10px] font-bold uppercase rounded-full">
+                      <div class="w-1.5 h-1.5 rounded-full bg-cream-pure animate-pulse"></div>
+                      Vencida
+                    </span>
+                  } @else if (diasRestantes(v.fecha) <= 3) {
+                    <span class="px-2 py-0.5 bg-gold text-brown text-[10px] font-bold uppercase rounded-full">
+                      Urgente
+                    </span>
+                  }
+                </div>
+                <h4 class="text-base font-bold text-brown">{{ formatFecha(v.fecha) }}</h4>
+                <p class="text-xs text-brown-muted mt-0.5">{{ v.apiarioNombre }}</p>
+                <p class="font-mono text-xs text-brown-muted/70 mt-0.5">
+                  {{ v.tipoVisita === 'RUTINARIA' ? 'Visita rutinaria' : 'Inspección' }}
+                </p>
+              </div>
+              <div class="text-right">
+                @if (diasRestantes(v.fecha) >= 0) {
+                  <p class="text-3xl font-bold text-brown leading-none">{{ diasRestantes(v.fecha) }}</p>
+                  <p class="text-xs text-brown-muted mt-0.5">días</p>
+                } @else {
+                  <p class="text-2xl font-bold text-error leading-none">{{ diasRestantes(v.fecha) * -1 }}</p>
+                  <p class="text-xs text-error/70 mt-0.5">atrasada</p>
                 }
               </div>
-              <h4 class="text-base font-bold text-brown mt-1">{{ formatFecha(visitaActiva()!.fecha) }}</h4>
-              <p class="font-mono text-xs text-brown-muted mt-0.5">
-                {{ visitaActiva()!.tipoVisita === 'RUTINARIA' ? 'Visita rutinaria' : 'Inspección' }}
-              </p>
-              @if (visitaActiva()!.reporte) {
-                <p class="text-xs text-brown-muted/70 mt-0.5">
-                  Reporte: {{ estadoLabel(visitaActiva()!.reporte!.estado) }}
-                </p>
-              }
             </div>
-            <div class="text-right">
-              @if (diasRestantes(visitaActiva()!.fecha) >= 0) {
-                <p class="text-3xl font-bold text-brown leading-none">{{ diasRestantes(visitaActiva()!.fecha) }}</p>
-                <p class="text-xs text-brown-muted mt-0.5">días</p>
-              } @else {
-                <p class="text-2xl font-bold text-error leading-none">{{ diasRestantes(visitaActiva()!.fecha) * -1 }}</p>
-                <p class="text-xs text-error/70 mt-0.5">atrasada</p>
-              }
-            </div>
-          </div>
 
-          @if (!visitaActiva()!.reporte || visitaActiva()!.reporte!.estado === 'BORRADOR') {
-            <button (click)="startForm()"
+            <button (click)="startForm(v)"
               class="w-full py-3 rounded-xl font-semibold text-sm transition-opacity active:opacity-80"
-              [class]="diasRestantes(visitaActiva()!.fecha) < 0 ? 'bg-error text-cream-pure' : 'bg-gold text-brown'">
-              {{ visitaActiva()!.reporte?.estado === 'BORRADOR' ? 'Continuar reporte' : 'Registrar visita' }}
+              [class]="diasRestantes(v.fecha) < 0 ? 'bg-error text-cream-pure' : 'bg-gold text-brown'">
+              Llenar visita
             </button>
-          } @else {
-            <div class="w-full py-3 rounded-xl bg-success-bg text-center">
-              <span class="text-sm font-semibold text-success">Reporte enviado ✓</span>
-            </div>
-          }
+          </div>
         </div>
-      </div>
-    }
+      }
 
-    <!-- No active visit -->
-    @if (!loading() && !visitaActiva()) {
-      <div class="flex flex-col items-center justify-center py-12 text-center">
-        <div class="w-16 h-16 rounded-full bg-success-bg flex items-center justify-center mb-4">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2F6B3E" stroke-width="2.5">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
+      <!-- Al día -->
+      @if (proximasVisitas().length === 0) {
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          <div class="w-16 h-16 rounded-full bg-success-bg flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2F6B3E" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h4 class="text-base font-bold text-brown">¡Al día!</h4>
+          <p class="text-sm text-brown-muted mt-1">No tienes visitas pendientes por llenar</p>
         </div>
-        <h4 class="text-base font-bold text-brown">¡Al día!</h4>
-        <p class="text-sm text-brown-muted mt-1">No hay visita activa en este momento</p>
-      </div>
+      }
     }
   </div>
 

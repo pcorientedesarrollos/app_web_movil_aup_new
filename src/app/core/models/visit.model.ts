@@ -56,6 +56,15 @@ export interface MiApiarioItem {
   visitasAnio: number;
 }
 
+export interface ProximaVisita {
+  visitaId: string;
+  reporteId: string;
+  fecha: string;
+  tipoVisita: 'RUTINARIA' | 'INSPECCION' | string;
+  apiarioNombre: string;
+  estado: string;
+}
+
 export interface VisitaDeApiario {
   visitaId: string;
   reporteId: string | null;
@@ -90,7 +99,7 @@ export interface VisitData {
   origenCera: 'COMPRADA' | 'MAQUINA';
   marcosIdentificados: boolean;
   reinasReemplazadas: number;
-  origenReina: 'PROPIA' | 'COMPRADA' | 'CACAHUATERA';
+  origenReina?: 'PROPIA' | 'COMPRADA' | 'CACAHUATERA';
   cosechaMiel: boolean;
   cosechaMielKg: number;
   cosechaCera: boolean;

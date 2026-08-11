@@ -16,12 +16,15 @@ export class StepQueenComponent implements OnInit, OnDestroy {
 
   form = this.fb.group({
     reinasReemplazadas: [this.store.formData().reinasReemplazadas ?? 0],
-    origenReina:        [this.store.formData().origenReina        ?? 'PROPIA'],
+    origenReina:        [this.store.formData().origenReina        ?? null],
   });
 
   ngOnInit(): void {
     this.form.valueChanges.pipe(debounceTime(400), takeUntil(this.destroy)).subscribe(v => {
-      this.store.patchData({ reinasReemplazadas: +v.reinasReemplazadas!, origenReina: v.origenReina as any });
+      this.store.patchData({
+        reinasReemplazadas: +v.reinasReemplazadas!,
+        ...(v.origenReina ? { origenReina: v.origenReina as any } : {}),
+      });
     });
   }
 

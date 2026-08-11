@@ -19,6 +19,10 @@ export class VisitasApiService {
     return firstValueFrom(this.http.get<any>(`${this.base}/auth/perfil`));
   }
 
+  getProximaVisita(): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/proxima-visita`));
+  }
+
   getVisitaActiva(): Promise<any> {
     return firstValueFrom(this.http.get<any>(`${this.base}/apicultor/visita-activa`));
   }

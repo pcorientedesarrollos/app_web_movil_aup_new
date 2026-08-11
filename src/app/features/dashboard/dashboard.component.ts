@@ -6,7 +6,7 @@ import { OfflineService } from '../../core/services/offline.service';
 import { VisitasApiService } from '../../core/services/visitas-api.service';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
 import { OfflineBannerComponent } from '../../shared/offline-banner/offline-banner.component';
-import { VisitaActivaResponse, MiReporteItem } from '../../core/models/visit.model';
+import { ProximaVisita, MiReporteItem } from '../../core/models/visit.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,24 +20,24 @@ export class DashboardComponent implements OnInit {
   readonly auth    = inject(AuthService);
   readonly offline = inject(OfflineService);
 
-  readonly visitaActiva   = signal<VisitaActivaResponse | null>(null);
-  readonly completedCount = signal(0);
-  readonly totalAnual     = 24;
-  readonly loading        = signal(true);
+  readonly proximasVisitas = signal<ProximaVisita[]>([]);
+  readonly completedCount  = signal(0);
+  readonly totalAnual      = 24;
+  readonly loading         = signal(true);
 
   async ngOnInit(): Promise<void> {
-    await Promise.all([this.loadVisitaActiva(), this.loadReportes()]);
+    await Promise.all([this.loadProximasVisitas(), this.loadReportes()]);
     this.loading.set(false);
   }
 
-  private async loadVisitaActiva(): Promise<void> {
+  private async loadProximasVisitas(): Promise<void> {
     try {
-      const res = await this.visitas.getVisitaActiva();
-      if (res.success && res.data?.visita) {
-        this.visitaActiva.set({ ...res.data.visita, reporte: res.data.reporte ?? null });
+      const res = await this.visitas.getProximaVisita();
+      if (res.success && Array.isArray(res.data)) {
+        this.proximasVisitas.set(res.data);
       }
     } catch {
-      this.visitaActiva.set(null);
+      this.proximasVisitas.set([]);
     }
   }
 
@@ -62,7 +62,6 @@ export class DashboardComponent implements OnInit {
   diasRestantes(fecha: string): number {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    // Parse date-only to avoid UTC→local timezone shift
     const [y, m, d] = fecha.split('T')[0].split('-').map(Number);
     const dest = new Date(y, m - 1, d);
     return Math.ceil((dest.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
@@ -75,14 +74,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  estadoLabel(estado: string): string {
-    const map: Record<string, string> = {
-      BORRADOR: 'Borrador', ENVIADO: 'Enviado',
-      REVISADO: 'Revisado', CON_OBSERVACIONES: 'Con observaciones',
-    };
-    return map[estado] ?? estado;
-  }
-
   getUrgencyClass(fecha: string): string {
     const dias = this.diasRestantes(fecha);
     if (dias < 0)  return 'border-l-4 border-error bg-error-bg';
@@ -90,9 +81,7 @@ export class DashboardComponent implements OnInit {
     return 'border border-cream-tan bg-cream-pure';
   }
 
-  startForm(): void {
-    const visita = this.visitaActiva();
-    if (!visita) return;
-    this.router.navigate(['/form'], { queryParams: { visitaId: visita.id } });
+  startForm(visita: ProximaVisita): void {
+    this.router.navigate(['/form'], { queryParams: { visitaId: visita.visitaId } });
   }
 }
