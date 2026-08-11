@@ -26,36 +26,82 @@
     }
 
     @for (v of visitas$(); track v.visitaId) {
-      <div (click)="openVisita(v.reporteId)"
-           class="card flex items-center gap-4 transition-opacity cursor-pointer"
-           [class.opacity-50]="!v.reporteId"
-           [class.active:opacity-80]="!!v.reporteId">
+      <div class="card flex flex-col gap-3">
 
-        <!-- Date badge -->
-        <div class="w-12 h-12 rounded-xl bg-gold/15 flex flex-col items-center justify-center flex-shrink-0">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C09A50" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
+        <!-- Top row -->
+        <div class="flex items-center gap-4"
+             [class.cursor-pointer]="v.estado !== 'BORRADOR' && v.reporteId"
+             (click)="v.estado !== 'BORRADOR' && v.reporteId ? openVisita(v) : null">
+
+          <!-- Date badge -->
+          <div class="w-12 h-12 rounded-xl bg-gold/15 flex flex-col items-center justify-center flex-shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C09A50" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-brown">{{ formatFecha(v.fecha) }}</p>
+            <p class="text-xs text-brown-muted mt-0.5">{{ tipoLabel(v.tipo) }}</p>
+            <span class="status-badge mt-1.5" [ngClass]="getStatusConfig(v.estado).cls">
+              {{ getStatusConfig(v.estado).label }}
+            </span>
+          </div>
+
+          <!-- Arrow (enviadas/revisadas) -->
+          @if (v.estado !== 'BORRADOR' && v.estado !== 'SIN_REPORTE' && v.reporteId) {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8916A" stroke-width="2" class="flex-shrink-0">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          }
         </div>
 
-        <!-- Info -->
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-brown">{{ formatFecha(v.fecha) }}</p>
-          <p class="text-xs text-brown-muted mt-0.5">{{ tipoLabel(v.tipo) }}</p>
-          <span class="status-badge mt-1.5" [ngClass]="getStatusConfig(v.estado).cls">
-            {{ getStatusConfig(v.estado).label }}
-          </span>
-        </div>
-
-        <!-- Arrow (only when has reporte) -->
-        @if (v.reporteId) {
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8916A" stroke-width="2" class="flex-shrink-0">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
+        <!-- Actions for BORRADOR -->
+        @if (v.estado === 'BORRADOR' && v.reporteId) {
+          @if (confirmandoId() === v.reporteId) {
+            <!-- Confirmation inline -->
+            <div class="flex flex-col gap-2 pt-1 border-t border-cream-tan">
+              <p class="text-xs text-brown-muted text-center">¿Limpiar todos los datos del borrador?</p>
+              <div class="flex gap-2">
+                <button (click)="cancelLimpiar()"
+                        class="flex-1 py-2 rounded-xl border border-cream-tan text-sm text-brown-muted font-medium">
+                  Cancelar
+                </button>
+                <button (click)="limpiarBorrador(v.reporteId)"
+                        [disabled]="limpiando()"
+                        class="flex-1 py-2 rounded-xl bg-error text-cream-pure text-sm font-semibold active:opacity-80 disabled:opacity-50">
+                  {{ limpiando() ? 'Limpiando…' : 'Sí, limpiar' }}
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="flex gap-2 pt-1 border-t border-cream-tan">
+              <button (click)="openVisita(v)"
+                      class="flex-1 py-2.5 rounded-xl bg-gold text-brown text-sm font-semibold active:opacity-80">
+                Llenar
+              </button>
+              <button (click)="confirmLimpiar(v.reporteId)"
+                      class="px-4 py-2.5 rounded-xl border border-cream-tan text-sm text-brown-muted font-medium active:bg-cream-tan">
+                Limpiar
+              </button>
+            </div>
+          }
         }
+
+        <!-- Action for SIN_REPORTE -->
+        @if (v.estado === 'SIN_REPORTE') {
+          <div class="pt-1 border-t border-cream-tan">
+            <button (click)="openVisita(v)"
+                    class="w-full py-2.5 rounded-xl bg-gold/70 text-brown text-sm font-semibold active:opacity-80">
+              Iniciar reporte
+            </button>
+          </div>
+        }
+
       </div>
     }
 

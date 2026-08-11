@@ -90,10 +90,6 @@ export class DashboardComponent implements OnInit {
     return 'border border-cream-tan bg-cream-pure';
   }
 
-  registrarNuevaVisita(): void {
-    this.router.navigate(['/form'], { queryParams: { nueva: '1' } });
-  }
-
   startForm(): void {
     const visita = this.visitaActiva();
     if (!visita) return;

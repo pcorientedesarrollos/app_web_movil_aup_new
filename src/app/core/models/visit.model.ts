@@ -71,8 +71,8 @@ export interface VisitData {
   apiarioId: string;
   colmenasInicial: number;
   colmenasFinal: number;
-  causasMuerteEnjambre: boolean;
-  causasTraslado: boolean;
+  causasMuerteEnjambre: number;
+  causasTraslado: number;
   causasDivisiones: number;
   causasNucleos: number;
   mantenimientoApiario: string[];

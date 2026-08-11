@@ -15,10 +15,12 @@ export class ApiaryVisitsComponent implements OnInit {
   private route   = inject(ActivatedRoute);
   private router  = inject(Router);
 
-  readonly visitas$ = signal<VisitaDeApiario[]>([]);
-  readonly loading  = signal(true);
+  readonly visitas$        = signal<VisitaDeApiario[]>([]);
+  readonly loading         = signal(true);
+  readonly confirmandoId   = signal<string | null>(null);
+  readonly limpiando       = signal(false);
 
-  readonly apiarioId  = this.route.snapshot.params['id'] as string;
+  readonly apiarioId     = this.route.snapshot.params['id'] as string;
   readonly nombreApiario = (this.route.snapshot.queryParams['nombre'] ?? 'Apiario') as string;
 
   async ngOnInit(): Promise<void> {
@@ -32,9 +34,36 @@ export class ApiaryVisitsComponent implements OnInit {
     }
   }
 
-  openVisita(reporteId: string | null): void {
-    if (!reporteId) return;
-    this.router.navigate(['/visits', reporteId], { queryParams: { apiario: this.apiarioId } });
+  openVisita(v: VisitaDeApiario): void {
+    if (v.estado === 'BORRADOR' || v.estado === 'SIN_REPORTE') {
+      this.router.navigate(['/form'], { queryParams: { visitaId: v.visitaId } });
+    } else if (v.reporteId) {
+      this.router.navigate(['/visits', v.reporteId], { queryParams: { apiario: this.apiarioId } });
+    }
+  }
+
+  confirmLimpiar(reporteId: string): void {
+    this.confirmandoId.set(reporteId);
+  }
+
+  cancelLimpiar(): void {
+    this.confirmandoId.set(null);
+  }
+
+  async limpiarBorrador(reporteId: string): Promise<void> {
+    this.limpiando.set(true);
+    try {
+      await this.visitas.limpiarBorrador(reporteId);
+      const res = await this.visitas.getVisitasApiario(this.apiarioId);
+      if (res.success && Array.isArray(res.data)) {
+        this.visitas$.set(res.data);
+      }
+    } catch {
+      // stay on page
+    } finally {
+      this.limpiando.set(false);
+      this.confirmandoId.set(null);
+    }
   }
 
   goBack(): void {

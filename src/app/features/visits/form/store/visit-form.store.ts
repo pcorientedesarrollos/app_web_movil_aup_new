@@ -38,7 +38,13 @@ export class VisitFormStore {
 
   readonly hiveCount = computed(() => {
     const d = this._state().data;
-    return (d.colmenasInicial ?? 0) + (d.causasDivisiones ?? 0) + (d.causasNucleos ?? 0);
+    return Math.max(0,
+      (d.colmenasInicial ?? 0)
+      - (d.causasMuerteEnjambre ?? 0)
+      - (d.causasTraslado ?? 0)
+      + (d.causasDivisiones ?? 0)
+      + (d.causasNucleos ?? 0)
+    );
   });
 
   private _isNuevaVisita = signal(false);

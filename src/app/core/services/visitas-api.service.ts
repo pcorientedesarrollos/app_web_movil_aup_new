@@ -67,6 +67,12 @@ export class VisitasApiService {
     );
   }
 
+  limpiarBorrador(reporteId: string): Promise<any> {
+    return firstValueFrom(
+      this.http.delete<any>(`${this.base}/apicultor/reportes/${reporteId}/borrador`)
+    );
+  }
+
   // ── Admin ────────────────────────────────────────────────────────────────
   private readonly adminBase = `${environment.apiUrl}/api/visitas/admin`;
 
@@ -97,8 +103,8 @@ export class VisitasApiService {
     if (data.apiarioId !== undefined) dto['apiarioId'] = data.apiarioId;
 
     if (data.colmenasInicial !== undefined) dto['colmenasAnteriores'] = data.colmenasInicial;
-    if (data.causasMuerteEnjambre !== undefined) dto['muerteEnjambrazon'] = data.causasMuerteEnjambre ? 1 : 0;
-    if (data.causasTraslado !== undefined) dto['traslado'] = data.causasTraslado ? 1 : 0;
+    if (data.causasMuerteEnjambre !== undefined) dto['muerteEnjambrazon'] = data.causasMuerteEnjambre ?? 0;
+    if (data.causasTraslado !== undefined) dto['traslado'] = data.causasTraslado ?? 0;
     if (data.causasDivisiones !== undefined) dto['divisiones'] = data.causasDivisiones;
     if (data.causasNucleos !== undefined) dto['nucleos'] = data.causasNucleos;
 
@@ -166,8 +172,8 @@ export class VisitasApiService {
     if (r.apiarioId) d.apiarioId = r.apiarioId;
 
     if (r.colmenasAnteriores != null) d.colmenasInicial = r.colmenasAnteriores;
-    if (r.muerteEnjambrazon != null) d.causasMuerteEnjambre = !!r.muerteEnjambrazon;
-    if (r.traslado != null) d.causasTraslado = !!r.traslado;
+    if (r.muerteEnjambrazon != null) d.causasMuerteEnjambre = r.muerteEnjambrazon ?? 0;
+    if (r.traslado != null) d.causasTraslado = r.traslado ?? 0;
     if (r.divisiones != null) d.causasDivisiones = r.divisiones;
     if (r.nucleos != null) d.causasNucleos = r.nucleos;
 

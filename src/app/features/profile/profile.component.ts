@@ -20,11 +20,15 @@ export class ProfileComponent {
   readonly personalData = computed(() => {
     const u = this.user();
     return [
-      { label: 'Usuario',    value: u?.username  ?? '—' },
-      { label: 'CURP',       value: u?.curp       ?? '—' },
-      { label: 'Municipio',  value: u?.municipio  ?? '—' },
-      { label: 'Estado',     value: u?.estado     ?? '—' },
-      { label: 'Domicilio',  value: u?.direccion  ?? '—' },
+      { label: 'Usuario',       value: u?.username            ?? '—' },
+      { label: 'CURP',          value: u?.curp                ?? '—' },
+      { label: 'RFC',           value: u?.rfc                 ?? '—' },
+      { label: 'Municipio',     value: u?.municipio           ?? '—' },
+      { label: 'Estado',        value: u?.estado              ?? '—' },
+      { label: 'Domicilio',     value: u?.direccion           ?? '—' },
+      { label: 'Tipo',          value: u != null ? (u.organica ? 'Orgánico' : 'Convencional') : '—' },
+      { label: 'Cód. Orgánico', value: u?.codigoOrganico      ?? '—' },
+      { label: 'Certificado',   value: u?.certificadoOrganico ?? '—' },
     ].filter(d => d.value !== '—');
   });
 

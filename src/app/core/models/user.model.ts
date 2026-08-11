@@ -13,10 +13,13 @@ export interface BeekerUser {
   username: string;
   nombre: string;
   curp?: string;
+  rfc?: string;
   municipio?: string;
   estado?: string;
   direccion?: string;
   organica: boolean;
+  codigoOrganico?: string;
+  certificadoOrganico?: string;
   apiarios: Apiario[];
 }
 
