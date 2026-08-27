@@ -27,6 +27,8 @@ export interface AnnualInspectionSummary {
   anio: number;
   versionFormulario: string;
   elegible: boolean;
+  habilitado: boolean;
+  iniciadoAt: string | null;
   general: {
     id: string | null;
     estado: AnnualInspectionStatus;

@@ -34,7 +34,7 @@
   <!-- Content -->
   <div class="flex-1 px-5 py-5 pb-24 flex flex-col gap-4">
 
-    @if (auth.currentUser()?.organica) {
+    @if (auth.currentUser()?.organica && annualEnabled()) {
       <button type="button" (click)="openAnnualInspection()"
         class="relative overflow-hidden rounded-2xl bg-brown p-4 text-left text-cream-pure shadow-card active:scale-[0.99]">
         <div class="absolute -right-5 -top-6 h-24 w-24 rounded-full border-[16px] border-gold/10"></div>

@@ -7,6 +7,7 @@ import { VisitasApiService } from '../../core/services/visitas-api.service';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
 import { OfflineBannerComponent } from '../../shared/offline-banner/offline-banner.component';
 import { ProximaVisita, MiReporteItem } from '../../core/models/visit.model';
+import { AnnualInspectionApiService } from '../../core/services/annual-inspection-api.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +18,7 @@ import { ProximaVisita, MiReporteItem } from '../../core/models/visit.model';
 export class DashboardComponent implements OnInit {
   private router  = inject(Router);
   private visitas = inject(VisitasApiService);
+  private annualInspection = inject(AnnualInspectionApiService);
   readonly auth    = inject(AuthService);
   readonly offline = inject(OfflineService);
 
@@ -24,10 +26,15 @@ export class DashboardComponent implements OnInit {
   readonly completedCount  = signal(0);
   readonly totalAnual      = 24;
   readonly currentYear     = new Date().getFullYear();
+  readonly annualEnabled   = signal(false);
   readonly loading         = signal(true);
 
   async ngOnInit(): Promise<void> {
-    await Promise.all([this.loadProximasVisitas(), this.loadReportes()]);
+    await Promise.all([
+      this.loadProximasVisitas(),
+      this.loadReportes(),
+      this.loadAnnualAvailability(),
+    ]);
     this.loading.set(false);
   }
 
@@ -57,6 +64,16 @@ export class DashboardComponent implements OnInit {
       }
     } catch {
       // stats quedan en 0
+    }
+  }
+
+  private async loadAnnualAvailability(): Promise<void> {
+    if (!this.auth.currentUser()?.organica) return;
+    try {
+      const response = await this.annualInspection.getSummary();
+      this.annualEnabled.set(response.data.habilitado);
+    } catch {
+      this.annualEnabled.set(false);
     }
   }
 
