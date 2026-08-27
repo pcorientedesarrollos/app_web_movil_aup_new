@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-bottom-nav',
@@ -8,7 +9,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   imports: [RouterLink, RouterLinkActive],
   template: `
     <nav class="flex items-stretch border-t border-cream-tan bg-cream-pure">
-      @for (item of navItems; track item.route) {
+      @for (item of navItems(); track item.route) {
         <a [routerLink]="item.route"
            routerLinkActive="text-gold border-t-2 border-gold"
            [routerLinkActiveOptions]="{ exact: item.exact }"
@@ -24,9 +25,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class BottomNavComponent {
   private san = inject(DomSanitizer);
+  private auth = inject(AuthService);
   private svg(s: string): SafeHtml { return this.san.bypassSecurityTrustHtml(s); }
 
-  readonly navItems = [
+  private readonly baseItems = [
     {
       route: '/dashboard',
       label: 'Pendientes',
@@ -58,4 +60,20 @@ export class BottomNavComponent {
              </svg>`)
     },
   ];
+
+  private readonly annualItem = {
+    route: '/annual-inspection',
+    label: 'Anual',
+    exact: false,
+    icon: this.svg(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+             <rect x="3" y="4" width="18" height="17" rx="2"/>
+             <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+             <line x1="3" y1="9" x2="21" y2="9"/><path d="m9 15 2 2 4-5"/>
+           </svg>`),
+  };
+
+  readonly navItems = computed(() => this.auth.currentUser()?.organica
+    ? [this.baseItems[0], this.annualItem, ...this.baseItems.slice(1)]
+    : this.baseItems
+  );
 }

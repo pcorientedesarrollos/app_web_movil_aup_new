@@ -23,6 +23,26 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'annual-inspection',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/annual-inspection/annual-inspection-overview.component').then(m => m.AnnualInspectionOverviewComponent),
+      },
+      {
+        path: 'general',
+        data: { kind: 'general' },
+        loadComponent: () => import('./features/annual-inspection/annual-inspection-form.component').then(m => m.AnnualInspectionFormComponent),
+      },
+      {
+        path: 'apiary/:id',
+        data: { kind: 'apiary' },
+        loadComponent: () => import('./features/annual-inspection/annual-inspection-form.component').then(m => m.AnnualInspectionFormComponent),
+      },
+    ],
+  },
+  {
     path: 'visits',
     canActivate: [authGuard],
     children: [

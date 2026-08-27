@@ -1,0 +1,193 @@
+<div class="flex min-h-full flex-col bg-cream">
+  <header class="sticky top-0 z-20 border-b border-cream-tan bg-cream-pure/95 px-5 pb-3 pt-4 backdrop-blur">
+    <div class="flex items-center gap-3">
+      <button type="button" (click)="previous()" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-brown-muted active:bg-cream-tan">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[10px] font-bold uppercase tracking-[0.16em] text-gold">{{ title }}</p>
+        @if (record()) {
+          <p class="mt-0.5 font-mono text-xs text-brown-muted">{{ record()!.anio }} · Paso {{ currentStep() + 1 }} de {{ sections.length }}</p>
+        }
+      </div>
+      @if (lastSaved() && !isReadOnly()) {
+        <div class="flex items-center gap-1 text-[10px] text-success">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Guardado
+        </div>
+      }
+    </div>
+    <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-cream-tan">
+      <div class="h-full rounded-full bg-gold transition-all duration-300" [style.width.%]="progress()"></div>
+    </div>
+  </header>
+
+  <main class="flex-1 px-5 pb-8 pt-5">
+    @if (loading()) {
+      <div class="flex justify-center py-20">
+        <div class="h-7 w-7 animate-spin rounded-full border-2 border-gold border-t-transparent"></div>
+      </div>
+    } @else if (!record()) {
+      <div class="rounded-2xl border border-error/20 bg-error-bg p-5 text-center">
+        <p class="text-sm font-semibold text-error">{{ error() }}</p>
+        <button type="button" (click)="goOverview()" class="mt-4 text-sm font-semibold text-brown underline">Volver</button>
+      </div>
+    } @else {
+      @if (isReadOnly()) {
+        <div class="mb-5 flex items-start gap-3 rounded-2xl border border-success/20 bg-success-bg px-4 py-3">
+          <svg class="mt-0.5 flex-shrink-0 text-success" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+          <div>
+            <p class="text-sm font-bold text-success">Formulario enviado</p>
+            <p class="mt-0.5 text-xs text-success/80">Puedes consultar sus respuestas, pero ya no se puede modificar.</p>
+          </div>
+        </div>
+      }
+
+      @if (currentStep() === 0) {
+        <section class="mb-5 overflow-hidden rounded-2xl border border-cream-tan bg-cream-pure shadow-card">
+          <div class="bg-brown px-4 py-3">
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-gold">Información registrada</p>
+          </div>
+          <div class="grid grid-cols-2 gap-px bg-cream-tan/60">
+            @for (row of identityRows; track row.label) {
+              <div class="bg-cream-pure px-3 py-3">
+                <p class="text-[9px] font-bold uppercase tracking-wide text-brown-muted">{{ row.label }}</p>
+                <p class="mt-1 break-words font-mono text-xs text-brown">{{ row.value }}</p>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <section class="mb-5">
+        @if (currentSection().eyebrow) {
+          <p class="text-[10px] font-bold uppercase leading-relaxed tracking-[0.14em] text-gold-dark">{{ currentSection().eyebrow }}</p>
+        }
+        <h1 class="mt-1 text-xl font-bold text-brown">{{ currentSection().title }}</h1>
+      </section>
+
+      @if (error()) {
+        <div class="mb-4 rounded-xl border border-error/20 bg-error-bg px-4 py-3 text-xs font-medium text-error">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" class="flex flex-col gap-5">
+        @for (question of currentSection().questions; track question.key) {
+          <div class="rounded-2xl border bg-cream-pure p-4 transition-colors"
+               [class]="isInvalid(question) ? 'border-error/50' : 'border-cream-tan'">
+            <label class="block text-sm font-semibold leading-snug text-brown">
+              {{ question.label }}
+              @if (question.required) { <span class="ml-0.5 text-error">*</span> }
+            </label>
+
+            @switch (question.type) {
+              @case ('text') {
+                <div class="mt-3 flex items-center gap-2">
+                  <input type="text" [formControl]="control(question)" [placeholder]="question.placeholder ?? ''" class="form-input">
+                  @if (question.suffix) { <span class="font-mono text-xs text-brown-muted">{{ question.suffix }}</span> }
+                </div>
+              }
+              @case ('textarea') {
+                <textarea [formControl]="control(question)" rows="3" class="form-input mt-3 resize-y"></textarea>
+              }
+              @case ('number') {
+                <div class="mt-3 flex items-center gap-2">
+                  <input type="number" min="0" inputmode="decimal" [formControl]="control(question)" class="form-input">
+                  @if (question.suffix) { <span class="font-mono text-xs text-brown-muted">{{ question.suffix }}</span> }
+                </div>
+              }
+              @case ('date') {
+                <input type="date" [formControl]="control(question)" class="form-input mt-3">
+              }
+              @case ('boolean') {
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                  <button type="button" (click)="setBoolean(question, true)" [disabled]="isReadOnly()"
+                    class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
+                    [class]="control(question).value === true ? 'border-gold bg-gold/15 text-brown' : 'border-cream-tan text-brown-muted'">Si</button>
+                  <button type="button" (click)="setBoolean(question, false)" [disabled]="isReadOnly()"
+                    class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
+                    [class]="control(question).value === false ? 'border-gold bg-gold/15 text-brown' : 'border-cream-tan text-brown-muted'">No</button>
+                </div>
+              }
+              @case ('radio') {
+                <div class="mt-3 flex flex-col gap-2">
+                  @for (option of question.options ?? []; track option) {
+                    <button type="button" (click)="selectOption(question, option)" [disabled]="isReadOnly()"
+                      class="flex items-center gap-3 rounded-xl border p-3 text-left transition"
+                      [class]="isSelected(question, option) ? 'border-gold bg-gold/10' : 'border-cream-tan'">
+                      <span class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2"
+                            [class]="isSelected(question, option) ? 'border-gold' : 'border-brown-muted/30'">
+                        @if (isSelected(question, option)) { <span class="h-2 w-2 rounded-full bg-gold"></span> }
+                      </span>
+                      <span class="text-sm text-brown">{{ option }}</span>
+                    </button>
+                  }
+                </div>
+              }
+              @case ('checkbox') {
+                <div class="mt-3 flex flex-wrap gap-2">
+                  @for (option of question.options ?? []; track option) {
+                    <button type="button" (click)="toggleCheckbox(question, option)" [disabled]="isReadOnly()"
+                      class="flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition"
+                      [class]="isSelected(question, option) ? 'border-gold bg-gold/15 text-brown' : 'border-cream-tan text-brown-muted'">
+                      <span class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border"
+                            [class]="isSelected(question, option) ? 'border-gold bg-gold' : 'border-brown-muted/30'">
+                        @if (isSelected(question, option)) {
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#4A2E1F" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        }
+                      </span>
+                      <span class="text-xs font-medium">{{ option }}</span>
+                    </button>
+                  }
+                </div>
+              }
+              @case ('signature') {
+                <div class="mt-3">
+                  @if (signatureValue(question)) {
+                    <div class="overflow-hidden rounded-xl border border-cream-tan bg-white p-2">
+                      <img [src]="signatureValue(question)" alt="Firma capturada" class="mx-auto max-h-32 object-contain">
+                    </div>
+                    @if (!isReadOnly()) {
+                      <button type="button" (click)="clearSignature(question)" class="mt-2 text-xs font-semibold text-error">Borrar y volver a firmar</button>
+                    }
+                  } @else {
+                    <app-signature-pad (signatureChange)="setSignature(question, $event)" />
+                  }
+                </div>
+              }
+            }
+
+            @if (isInvalid(question)) {
+              <p class="mt-2 text-xs font-medium text-error">Este campo es requerido.</p>
+            }
+          </div>
+        }
+      </form>
+
+      <div class="mt-6 flex flex-col gap-3">
+        @if (currentStep() < sections.length - 1) {
+          <button type="button" (click)="next()" [disabled]="saving()" class="btn-primary">
+            {{ saving() ? 'Guardando...' : 'Guardar y continuar' }}
+          </button>
+        } @else if (!isReadOnly()) {
+          <button type="button" (click)="submit()" [disabled]="sending()" class="btn-primary">
+            {{ sending() ? 'Enviando...' : 'Enviar formulario anual' }}
+          </button>
+        } @else {
+          <button type="button" (click)="goOverview()" class="btn-primary">Volver a la inspección anual</button>
+        }
+
+        @if (!isReadOnly()) {
+          <button type="button" (click)="saveAndExit()" [disabled]="saving() || sending()" class="btn-secondary">
+            Guardar borrador y salir
+          </button>
+        }
+
+        @if (currentStep() > 0) {
+          <button type="button" (click)="previous()" class="py-2 text-center text-sm font-semibold text-brown-muted">Atrás</button>
+        }
+      </div>
+    }
+  </main>
+</div>

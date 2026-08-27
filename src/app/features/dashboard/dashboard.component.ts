@@ -23,6 +23,7 @@ export class DashboardComponent implements OnInit {
   readonly proximasVisitas = signal<ProximaVisita[]>([]);
   readonly completedCount  = signal(0);
   readonly totalAnual      = 24;
+  readonly currentYear     = new Date().getFullYear();
   readonly loading         = signal(true);
 
   async ngOnInit(): Promise<void> {
@@ -83,5 +84,9 @@ export class DashboardComponent implements OnInit {
 
   startForm(visita: ProximaVisita): void {
     this.router.navigate(['/form'], { queryParams: { visitaId: visita.visitaId } });
+  }
+
+  openAnnualInspection(): void {
+    this.router.navigate(['/annual-inspection']);
   }
 }
