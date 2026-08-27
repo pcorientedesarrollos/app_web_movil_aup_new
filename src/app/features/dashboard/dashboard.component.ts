@@ -8,6 +8,7 @@ import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component
 import { OfflineBannerComponent } from '../../shared/offline-banner/offline-banner.component';
 import { ProximaVisita, MiReporteItem } from '../../core/models/visit.model';
 import { AnnualInspectionApiService } from '../../core/services/annual-inspection-api.service';
+import { APP_FEATURES } from '../../core/config/feature-flags';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,6 +27,7 @@ export class DashboardComponent implements OnInit {
   readonly completedCount  = signal(0);
   readonly totalAnual      = 24;
   readonly currentYear     = new Date().getFullYear();
+  readonly annualInspectionVisible = APP_FEATURES.annualInspection;
   readonly annualEnabled   = signal(false);
   readonly loading         = signal(true);
 
@@ -68,6 +70,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private async loadAnnualAvailability(): Promise<void> {
+    if (!this.annualInspectionVisible) return;
     if (!this.auth.currentUser()?.organica) return;
     try {
       const response = await this.annualInspection.getSummary();

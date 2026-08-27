@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, adminGuard } from './core/guards/auth.guard';
+import { annualInspectionVisibilityGuard } from './core/guards/annual-inspection-visibility.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -24,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'annual-inspection',
+    canMatch: [annualInspectionVisibilityGuard],
     canActivate: [authGuard],
     children: [
       {

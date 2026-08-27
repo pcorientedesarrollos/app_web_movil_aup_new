@@ -3,6 +3,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { AnnualInspectionApiService } from '../../core/services/annual-inspection-api.service';
+import { APP_FEATURES } from '../../core/config/feature-flags';
 
 @Component({
   selector: 'app-bottom-nav',
@@ -29,6 +30,7 @@ export class BottomNavComponent implements OnInit {
   private auth = inject(AuthService);
   private annualInspection = inject(AnnualInspectionApiService);
   private annualEnabled = signal(false);
+  private readonly annualInspectionVisible: boolean = APP_FEATURES.annualInspection;
   private svg(s: string): SafeHtml { return this.san.bypassSecurityTrustHtml(s); }
 
   private readonly baseItems = [
@@ -75,12 +77,15 @@ export class BottomNavComponent implements OnInit {
            </svg>`),
   };
 
-  readonly navItems = computed(() => this.auth.currentUser()?.organica && this.annualEnabled()
+  readonly navItems = computed(() => this.annualInspectionVisible
+    && this.auth.currentUser()?.organica
+    && this.annualEnabled()
     ? [this.baseItems[0], this.annualItem, ...this.baseItems.slice(1)]
     : this.baseItems
   );
 
   async ngOnInit(): Promise<void> {
+    if (!this.annualInspectionVisible) return;
     if (!this.auth.currentUser()?.organica) return;
     try {
       const response = await this.annualInspection.getSummary();
