@@ -21,6 +21,7 @@ export class AdminReporteDetalleComponent implements OnInit {
 
   readonly reporte = signal<any>(null);
   readonly loading = signal(true);
+  readonly updated = this.route.snapshot.queryParamMap.get('actualizado') === '1';
 
   async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.params['id'];
@@ -39,6 +40,10 @@ export class AdminReporteDetalleComponent implements OnInit {
     } else {
       this.router.navigate(['/admin']);
     }
+  }
+
+  editar(): void {
+    this.router.navigate(['/admin/reporte', this.reporte()?.id, 'editar']);
   }
 
   get datos(): Partial<VisitData> | null {
@@ -86,9 +91,19 @@ export class AdminReporteDetalleComponent implements OnInit {
         titulo: 'Colmenas',
         filas: [
           { label: 'Colmenas iniciales', value: String(d.colmenasInicial ?? '—') },
-          { label: 'Total final',        value: String((d.colmenasInicial ?? 0) + (d.causasDivisiones ?? 0) + (d.causasNucleos ?? 0)) },
-          { label: 'Muerte/Enjambre',    value: d.causasMuerteEnjambre ? 'Sí' : 'No' },
-          { label: 'Traslado',           value: d.causasTraslado ? 'Sí' : 'No' },
+          {
+            label: 'Total final',
+            value: String(Math.max(
+              0,
+              (d.colmenasInicial ?? 0)
+                - (d.causasMuerteEnjambre ?? 0)
+                - (d.causasTraslado ?? 0)
+                + (d.causasDivisiones ?? 0)
+                + (d.causasNucleos ?? 0),
+            )),
+          },
+          { label: 'Muerte/Enjambre',    value: String(d.causasMuerteEnjambre ?? 0) },
+          { label: 'Traslado',           value: String(d.causasTraslado ?? 0) },
           { label: 'Divisiones',         value: d.causasDivisiones != null ? String(d.causasDivisiones) : '—' },
           { label: 'Núcleos',            value: d.causasNucleos != null ? String(d.causasNucleos) : '—' },
         ],

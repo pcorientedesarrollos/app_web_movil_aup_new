@@ -23,11 +23,17 @@ export class StepNotesComponent implements OnInit, OnDestroy {
 
   form = this.fb.group({
     notas: [this.store.formData().notas ?? ''],
+    observacionesInspector: [this.store.formData().observacionesInspector ?? ''],
   });
 
   ngOnInit(): void {
     this.form.valueChanges.pipe(debounceTime(400), takeUntil(this.destroy)).subscribe(v => {
-      this.store.patchData({ notas: v.notas! });
+      this.store.patchData({
+        notas: v.notas!,
+        ...(this.store.isAdminEdit()
+          ? { observacionesInspector: v.observacionesInspector! }
+          : {}),
+      });
     });
   }
 
@@ -51,8 +57,21 @@ export class StepNotesComponent implements OnInit, OnDestroy {
 
   async submit(): Promise<void> {
     this.submitError.set('');
+    this.store.patchData({
+      notas: this.form.get('notas')!.value!,
+      ...(this.store.isAdminEdit()
+        ? { observacionesInspector: this.form.get('observacionesInspector')!.value! }
+        : {}),
+    });
     this.store.setSubmitting(true);
     try {
+      if (this.store.isAdminEdit()) {
+        await this.store.guardarEdicionAdmin();
+        this.router.navigate(['/admin/reporte', this.store.reporteId()], {
+          queryParams: { actualizado: '1' },
+        });
+        return;
+      }
       const wasOffline = await this.store.enviarReporte();
       if (!wasOffline) await this.store.clearDraft();
       this.router.navigate(['/success'], {

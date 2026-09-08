@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { VisitFormStore } from './store/visit-form.store';
 import { StepVisitDataComponent }  from './steps/step-0-visit-data/step-visit-data.component';
@@ -26,6 +26,7 @@ export class FormShellComponent implements OnInit {
   private route  = inject(ActivatedRoute);
   private router = inject(Router);
   readonly store = inject(VisitFormStore);
+  readonly initializationError = signal('');
 
   readonly STEP_TITLES = [
     'Datos de la Visita',
@@ -46,21 +47,37 @@ export class FormShellComponent implements OnInit {
 
   goBack(): void {
     if (this.store.currentStep() === 0) {
-      this.router.navigate(['/visits']);
+      if (this.store.isAdminEdit()) {
+        this.router.navigate(['/admin/reporte', this.store.reporteId()]);
+      } else {
+        this.router.navigate(['/visits']);
+      }
     } else {
       this.store.prevStep();
     }
   }
 
   async ngOnInit(): Promise<void> {
+    const adminEdit = this.route.snapshot.data['adminEdit'] === true;
+    this.store.resetForNavigation(adminEdit);
     const visitaId = this.route.snapshot.queryParams['visitaId'];
     const nueva    = this.route.snapshot.queryParams['nueva'];
-    if (visitaId) {
-      await this.store.iniciarReporte(visitaId);
-    } else if (nueva === '1') {
-      await this.store.iniciarNuevaVisita();
-    } else {
-      await this.store.loadDraft();
+    try {
+      if (adminEdit) {
+        await this.store.loadAdminReporte(this.route.snapshot.params['id']);
+      } else if (visitaId) {
+        await this.store.iniciarReporte(visitaId);
+      } else if (nueva === '1') {
+        await this.store.iniciarNuevaVisita();
+      } else {
+        await this.store.loadDraft();
+      }
+    } catch (error: any) {
+      this.initializationError.set(
+        error?.error?.error?.details ?? error?.message ?? 'No fue posible cargar la visita',
+      );
+    } finally {
+      this.store.markReady();
     }
   }
 }

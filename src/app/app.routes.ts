@@ -85,6 +85,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/reportes/admin-reportes-apicultor.component').then(m => m.AdminReportesApicultorComponent),
       },
       {
+        path: 'reporte/:id/editar',
+        data: { adminEdit: true },
+        loadComponent: () => import('./features/visits/form/form-shell.component').then(m => m.FormShellComponent),
+      },
+      {
         path: 'reporte/:id',
         loadComponent: () => import('./features/admin/reportes/admin-reporte-detalle.component').then(m => m.AdminReporteDetalleComponent),
       },
