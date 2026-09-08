@@ -96,18 +96,6 @@ export class VisitasApiService {
     return firstValueFrom(this.http.get<any>(`${this.adminBase}/reportes/${reporteId}`));
   }
 
-  adminGetApiariosApicultor(apicultorId: string): Promise<any> {
-    return firstValueFrom(
-      this.http.get<any>(`${this.adminBase}/apicultores/${apicultorId}/apiarios`)
-    );
-  }
-
-  adminSaveReporte(reporteId: string, data: Partial<VisitData>): Promise<any> {
-    return firstValueFrom(
-      this.http.patch<any>(`${this.adminBase}/reportes/${reporteId}/datos`, this.toApiDto(data))
-    );
-  }
-
   // Frontend VisitData → backend SaveReporteDTO
   toApiDto(data: Partial<VisitData>): Record<string, unknown> {
     const dto: Record<string, unknown> = {};
@@ -175,9 +163,6 @@ export class VisitasApiService {
 
     if (data.notas !== undefined) dto['notas'] = data.notas;
     if (data.firma !== undefined) dto['firma'] = data.firma;
-    if (data.observacionesInspector !== undefined) {
-      dto['observacionesInspector'] = data.observacionesInspector;
-    }
 
     return dto;
   }
@@ -186,12 +171,9 @@ export class VisitasApiService {
   fromApiReporte(r: any): Partial<VisitData> {
     const d: Partial<VisitData> = {};
 
-    const fecha = r.fechaVisita ?? r.visita?.fecha;
-    const tipo = r.tipoVisitaApicultor ?? r.visita?.tipoVisita;
-    const apiarioId = r.apiarioId ?? r.visita?.apiarioId;
-    if (fecha) d.fecha = fecha.split('T')[0];
-    if (tipo) d.tipo = tipo === 'RUTINARIA' ? 'RUTINA' : 'INSPECCION';
-    if (apiarioId) d.apiarioId = apiarioId;
+    if (r.fechaVisita) d.fecha = r.fechaVisita.split('T')[0];
+    if (r.tipoVisitaApicultor) d.tipo = r.tipoVisitaApicultor === 'RUTINARIA' ? 'RUTINA' : 'INSPECCION';
+    if (r.apiarioId) d.apiarioId = r.apiarioId;
 
     if (r.colmenasAnteriores != null) d.colmenasInicial = r.colmenasAnteriores;
     if (r.muerteEnjambrazon != null) d.causasMuerteEnjambre = r.muerteEnjambrazon ?? 0;
@@ -254,9 +236,6 @@ export class VisitasApiService {
 
     if (r.notas) d.notas = r.notas;
     if (r.firma) d.firma = r.firma;
-    if (r.observacionesInspector != null) {
-      d.observacionesInspector = r.observacionesInspector;
-    }
 
     return d;
   }

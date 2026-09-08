@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, ViewChild, AfterViewInit,
-  Input, Output, EventEmitter, signal
+  Output, EventEmitter, signal
 } from '@angular/core';
 
 @Component({
@@ -51,7 +51,6 @@ import {
 })
 export class SignaturePadComponent implements AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
-  @Input() initialSignature = '';
   @Output() signatureChange = new EventEmitter<string>();
 
   private ctx!: CanvasRenderingContext2D;
@@ -70,15 +69,6 @@ export class SignaturePadComponent implements AfterViewInit {
     this.ctx.lineWidth   = 2.5;
     this.ctx.lineCap     = 'round';
     this.ctx.lineJoin    = 'round';
-
-    if (this.initialSignature) {
-      const image = new Image();
-      image.onload = () => {
-        this.ctx.drawImage(image, 0, 0, rect.width, rect.height);
-        this.hasSignature.set(true);
-      };
-      image.src = this.initialSignature;
-    }
   }
 
   startDraw(event: MouseEvent | TouchEvent): void {

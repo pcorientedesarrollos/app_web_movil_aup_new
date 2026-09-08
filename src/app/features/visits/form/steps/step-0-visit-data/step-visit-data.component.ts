@@ -17,12 +17,10 @@ export class StepVisitDataComponent implements OnInit, OnDestroy {
   private destroy = new Subject<void>();
 
   readonly apiaries = computed(() =>
-    this.store.isAdminEdit()
-      ? this.store.availableApiaries()
-      : (this.auth.currentUser()?.apiarios ?? []).map(a => ({
-          id: a.id,
-          label: `${a.nombre} · ${a.colmenas} COLMENAS`,
-        }))
+    (this.auth.currentUser()?.apiarios ?? []).map(a => ({
+      id: a.id,
+      label: `${a.nombre} · ${a.colmenas} COLMENAS`,
+    }))
   );
 
   form = this.fb.group({

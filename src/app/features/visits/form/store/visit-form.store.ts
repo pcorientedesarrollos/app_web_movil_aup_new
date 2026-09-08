@@ -35,9 +35,6 @@ export class VisitFormStore {
   readonly isSubmitting = computed(() => this._state().isSubmitting);
   readonly lastSaved    = computed(() => this._state().lastSaved);
   readonly reporteId    = computed(() => this._state().reporteId);
-  readonly ready        = signal(false);
-  readonly isAdminEdit  = signal(false);
-  readonly availableApiaries = signal<{ id: string; label: string }[]>([]);
 
   readonly hiveCount = computed(() => {
     const d = this._state().data;
@@ -59,10 +56,8 @@ export class VisitFormStore {
   constructor() {
     effect(() => {
       if (this._state().isDirty) {
-        if (!this.isAdminEdit()) {
-          if (this.saveTimeout) clearTimeout(this.saveTimeout);
-          this.saveTimeout = setTimeout(() => this.persistDraft(), 800);
-        }
+        if (this.saveTimeout) clearTimeout(this.saveTimeout);
+        this.saveTimeout = setTimeout(() => this.persistDraft(), 800);
 
         if (!this.offline.isOffline() && this._state().reporteId) {
           if (this.apiSaveTimeout) clearTimeout(this.apiSaveTimeout);
@@ -81,16 +76,7 @@ export class VisitFormStore {
     const reporteId = this._state().reporteId;
     if (!reporteId) return;
     try {
-      if (this.isAdminEdit()) {
-        await this.visitas.adminSaveReporte(reporteId, this._state().data);
-        this._state.update(s => ({
-          ...s,
-          lastSaved: new Date().toISOString(),
-          isDirty: false,
-        }));
-      } else {
-        await this.visitas.saveReporte(reporteId, this._state().data);
-      }
+      await this.visitas.saveReporte(reporteId, this._state().data);
     } catch {
       // Silently fail — IndexedDB conserva el borrador
     }
@@ -114,64 +100,6 @@ export class VisitFormStore {
 
   setSubmitting(val: boolean): void {
     this._state.update(s => ({ ...s, isSubmitting: val }));
-  }
-
-  resetForNavigation(adminEdit = false): void {
-    if (this.saveTimeout) clearTimeout(this.saveTimeout);
-    if (this.apiSaveTimeout) clearTimeout(this.apiSaveTimeout);
-    this.saveTimeout = null;
-    this.apiSaveTimeout = null;
-    this._state.set({ ...INITIAL_STATE });
-    this._isNuevaVisita.set(false);
-    this.isAdminEdit.set(adminEdit);
-    this.availableApiaries.set([]);
-    this.ready.set(false);
-  }
-
-  markReady(): void {
-    this.ready.set(true);
-  }
-
-  async loadAdminReporte(reporteId: string): Promise<void> {
-    const res = await this.visitas.adminGetReporteDetalle(reporteId);
-    if (!res?.success || !res.data) {
-      throw new Error('No se encontró el reporte que deseas editar');
-    }
-
-    const reporte = res.data;
-    const apiariosRes = await this.visitas.adminGetApiariosApicultor(reporte.apicultorId);
-    const apiarios = (apiariosRes?.data?.apiarios ?? []).map((apiario: any) => ({
-      id: apiario.id,
-      label: `${apiario.nombre} · ${apiario.colmenas} COLMENAS`,
-    }));
-    const apiarioActual = reporte.visita?.apiario;
-    if (apiarioActual && !apiarios.some((apiario: { id: string }) => apiario.id === apiarioActual.id)) {
-      apiarios.unshift({
-        id: apiarioActual.id,
-        label: `${apiarioActual.nombre} · ${apiarioActual.colmenas} COLMENAS · INACTIVO`,
-      });
-    }
-
-    this.availableApiaries.set(apiarios);
-    this._state.set({
-      ...INITIAL_STATE,
-      visitId: reporte.visitaId,
-      reporteId: reporte.id,
-      data: this.visitas.fromApiReporte(reporte),
-      lastSaved: reporte.updatedAt ?? null,
-    });
-  }
-
-  async guardarEdicionAdmin(): Promise<void> {
-    const reporteId = this._state().reporteId;
-    if (!reporteId) throw new Error('No se encontró el reporte que deseas guardar');
-
-    await this.visitas.adminSaveReporte(reporteId, this._state().data);
-    this._state.update(s => ({
-      ...s,
-      lastSaved: new Date().toISOString(),
-      isDirty: false,
-    }));
   }
 
   async iniciarNuevaVisita(): Promise<void> {

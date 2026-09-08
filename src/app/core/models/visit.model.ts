@@ -106,5 +106,4 @@ export interface VisitData {
   cosechaCeraKg: number;
   notas: string;
   firma: string;
-  observacionesInspector: string;
 }

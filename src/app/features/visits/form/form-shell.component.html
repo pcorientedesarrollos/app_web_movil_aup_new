@@ -12,7 +12,7 @@
       </button>
       <div class="flex-1 text-center">
         <span class="text-xs font-semibold text-brown-muted uppercase tracking-wide">
-          {{ store.isAdminEdit() ? 'Edición administrativa' : 'Paso ' + (store.currentStep() + 1) + ' de 10' }}
+          Paso {{ store.currentStep() + 1 }} de 10
         </span>
       </div>
       @if (store.lastSaved()) {
@@ -38,29 +38,17 @@
 
   <!-- Step content -->
   <div class="flex-1 overflow-y-auto px-5 py-5 pb-6">
-    @if (!store.ready()) {
-      <div class="flex flex-col items-center justify-center py-20 gap-3">
-        <div class="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-sm text-brown-muted">Cargando visita...</p>
-      </div>
-    } @else if (initializationError()) {
-      <div class="rounded-2xl border border-error/20 bg-error-bg px-5 py-6 text-center">
-        <p class="text-sm font-semibold text-error">{{ initializationError() }}</p>
-        <button type="button" (click)="goBack()" class="btn-secondary mt-4">Volver</button>
-      </div>
-    } @else {
-      @switch (store.currentStep()) {
-        @case (0) { <app-step-visit-data /> }
-        @case (1) { <app-step-hive-count /> }
-        @case (2) { <app-step-maintenance /> }
-        @case (3) { <app-step-feeding /> }
-        @case (4) { <app-step-varroa /> }
-        @case (5) { <app-step-pest-control /> }
-        @case (6) { <app-step-wax /> }
-        @case (7) { <app-step-queen /> }
-        @case (8) { <app-step-harvest /> }
-        @case (9) { <app-step-notes /> }
-      }
+    @switch (store.currentStep()) {
+      @case (0) { <app-step-visit-data /> }
+      @case (1) { <app-step-hive-count /> }
+      @case (2) { <app-step-maintenance /> }
+      @case (3) { <app-step-feeding /> }
+      @case (4) { <app-step-varroa /> }
+      @case (5) { <app-step-pest-control /> }
+      @case (6) { <app-step-wax /> }
+      @case (7) { <app-step-queen /> }
+      @case (8) { <app-step-harvest /> }
+      @case (9) { <app-step-notes /> }
     }
   </div>
 </div>

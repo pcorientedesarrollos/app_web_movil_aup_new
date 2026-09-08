@@ -8,26 +8,10 @@
               class="form-input resize-none"></textarea>
   </div>
 
-  @if (store.isAdminEdit()) {
-    <div class="rounded-2xl border border-gold/30 bg-gold/5 p-4">
-      <label class="form-label">Notas del inspector</label>
-      <textarea
-        formControlName="observacionesInspector"
-        rows="4"
-        placeholder="Agrega observaciones administrativas sobre esta visita..."
-        class="form-input resize-none"
-      ></textarea>
-    </div>
-  }
-
   <!-- Signature -->
   <div>
     <label class="form-label">Firma del apicultor</label>
-    <app-signature-pad
-      [initialSignature]="store.formData().firma ?? ''"
-      (signatureChange)="onSignatureChange($event)"
-      class="block mt-1"
-    />
+    <app-signature-pad (signatureChange)="onSignatureChange($event)" class="block mt-1" />
   </div>
 
   <!-- Summary -->
@@ -63,16 +47,12 @@
         </svg>
         Enviando...
       </span>
-    } @else if (store.isAdminEdit()) {
-      Guardar cambios
     } @else if (offline.isOffline()) {
       Guardar sin conexión
     } @else {
       Enviar reporte
     }
   </button>
-  @if (!store.isAdminEdit()) {
-    <button type="button" (click)="saveDraft()" class="btn-secondary -mt-2">Guardar borrador</button>
-  }
+  <button type="button" (click)="saveDraft()" class="btn-secondary -mt-2">Guardar borrador</button>
   <button type="button" (click)="store.prevStep()" class="text-sm text-brown-muted text-center py-2">Atrás</button>
 </form>
