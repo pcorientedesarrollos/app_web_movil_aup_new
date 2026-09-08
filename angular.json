@@ -76,6 +76,27 @@
               ],
               "outputHashing": "all"
             },
+            "organico": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.organico.ts"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -98,6 +119,9 @@
           "configurations": {
             "production": {
               "buildTarget": "oaxacamiel-app:build:production"
+            },
+            "organico": {
+              "buildTarget": "oaxacamiel-app:build:organico"
             },
             "development": {
               "buildTarget": "oaxacamiel-app:build:development"
