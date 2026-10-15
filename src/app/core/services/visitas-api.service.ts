@@ -163,6 +163,9 @@ export class VisitasApiService {
 
     if (data.notas !== undefined) dto['notas'] = data.notas;
     if (data.firma !== undefined) dto['firma'] = data.firma;
+    if (data.nombreFirmaApicultor !== undefined) dto['nombreFirmaApicultor'] = data.nombreFirmaApicultor;
+    if (data.firmaInspector !== undefined) dto['firmaInspector'] = data.firmaInspector;
+    if (data.nombreFirmaInspector !== undefined) dto['nombreFirmaInspector'] = data.nombreFirmaInspector;
 
     return dto;
   }
@@ -236,6 +239,9 @@ export class VisitasApiService {
 
     if (r.notas) d.notas = r.notas;
     if (r.firma) d.firma = r.firma;
+    if (r.nombreFirmaApicultor) d.nombreFirmaApicultor = r.nombreFirmaApicultor;
+    if (r.firmaInspector) d.firmaInspector = r.firmaInspector;
+    if (r.nombreFirmaInspector) d.nombreFirmaInspector = r.nombreFirmaInspector;
 
     return d;
   }

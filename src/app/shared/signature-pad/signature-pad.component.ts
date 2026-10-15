@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, ViewChild, AfterViewInit,
-  Output, EventEmitter, signal
+  Input, Output, EventEmitter, signal, OnChanges, SimpleChanges
 } from '@angular/core';
 
 @Component({
@@ -49,12 +49,15 @@ import {
     </div>
   `
 })
-export class SignaturePadComponent implements AfterViewInit {
+export class SignaturePadComponent implements AfterViewInit, OnChanges {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @Input() value = '';
   @Output() signatureChange = new EventEmitter<string>();
 
   private ctx!: CanvasRenderingContext2D;
   private painting = false;
+  private viewInitialized = false;
+  private renderVersion = 0;
   readonly hasSignature = signal(false);
 
   ngAfterViewInit(): void {
@@ -69,6 +72,12 @@ export class SignaturePadComponent implements AfterViewInit {
     this.ctx.lineWidth   = 2.5;
     this.ctx.lineCap     = 'round';
     this.ctx.lineJoin    = 'round';
+    this.viewInitialized = true;
+    this.renderValue();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['value'] && this.viewInitialized) this.renderValue();
   }
 
   startDraw(event: MouseEvent | TouchEvent): void {
@@ -100,6 +109,26 @@ export class SignaturePadComponent implements AfterViewInit {
     this.ctx.clearRect(0, 0, c.width, c.height);
     this.hasSignature.set(false);
     this.signatureChange.emit('');
+  }
+
+  private renderValue(): void {
+    const canvas = this.canvasRef.nativeElement;
+    const version = ++this.renderVersion;
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!this.value) {
+      this.hasSignature.set(false);
+      return;
+    }
+
+    const image = new Image();
+    image.onload = () => {
+      if (version !== this.renderVersion) return;
+      const rect = canvas.getBoundingClientRect();
+      this.ctx.drawImage(image, 0, 0, rect.width, rect.height);
+      this.hasSignature.set(true);
+    };
+    image.src = this.value;
   }
 
   private getCoords(event: MouseEvent | TouchEvent): { x: number; y: number } {

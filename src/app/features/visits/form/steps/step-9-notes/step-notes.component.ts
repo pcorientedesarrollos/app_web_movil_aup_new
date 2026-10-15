@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { VisitFormStore } from '../../store/visit-form.store';
 import { SignaturePadComponent } from '../../../../../shared/signature-pad/signature-pad.component';
 import { OfflineService } from '../../../../../core/services/offline.service';
@@ -21,20 +21,30 @@ export class StepNotesComponent implements OnInit, OnDestroy {
 
   readonly submitError = signal('');
 
-  form = this.fb.group({
+  form = this.fb.nonNullable.group({
     notas: [this.store.formData().notas ?? ''],
+    nombreFirmaApicultor: [this.store.formData().nombreFirmaApicultor ?? '', [Validators.required, Validators.pattern(/\S/)]],
+    nombreFirmaInspector: [this.store.formData().nombreFirmaInspector ?? '', [Validators.required, Validators.pattern(/\S/)]],
   });
 
   ngOnInit(): void {
-    this.form.valueChanges.pipe(debounceTime(400), takeUntil(this.destroy)).subscribe(v => {
-      this.store.patchData({ notas: v.notas! });
+    this.form.valueChanges.pipe(takeUntil(this.destroy)).subscribe(v => {
+      this.store.patchData({
+        notas: v.notas,
+        nombreFirmaApicultor: v.nombreFirmaApicultor,
+        nombreFirmaInspector: v.nombreFirmaInspector,
+      });
     });
   }
 
   ngOnDestroy(): void { this.destroy.next(); this.destroy.complete(); }
 
-  onSignatureChange(dataUrl: string): void {
+  onApicultorSignatureChange(dataUrl: string): void {
     this.store.patchData({ firma: dataUrl });
+  }
+
+  onInspectorSignatureChange(dataUrl: string): void {
+    this.store.patchData({ firmaInspector: dataUrl });
   }
 
   get summaryRows(): { label: string; value: string }[] {
@@ -51,6 +61,21 @@ export class StepNotesComponent implements OnInit, OnDestroy {
 
   async submit(): Promise<void> {
     this.submitError.set('');
+    const nombreFirmaApicultor = this.form.controls.nombreFirmaApicultor.value.trim();
+    const nombreFirmaInspector = this.form.controls.nombreFirmaInspector.value.trim();
+    this.store.patchData({
+      notas: this.form.controls.notas.value,
+      nombreFirmaApicultor,
+      nombreFirmaInspector,
+    });
+
+    const data = this.store.formData();
+    if (!data.firma || !nombreFirmaApicultor || !data.firmaInspector || !nombreFirmaInspector) {
+      this.form.markAllAsTouched();
+      this.submitError.set('Captura la firma y el nombre del apicultor y del inspector.');
+      return;
+    }
+
     this.store.setSubmitting(true);
     try {
       const wasOffline = await this.store.enviarReporte();
@@ -66,7 +91,11 @@ export class StepNotesComponent implements OnInit, OnDestroy {
   }
 
   saveDraft(): void {
-    this.store.patchData({ notas: this.form.get('notas')!.value! });
+    this.store.patchData({
+      notas: this.form.controls.notas.value,
+      nombreFirmaApicultor: this.form.controls.nombreFirmaApicultor.value.trim(),
+      nombreFirmaInspector: this.form.controls.nombreFirmaInspector.value.trim(),
+    });
     this.router.navigate(['/dashboard']);
   }
 }

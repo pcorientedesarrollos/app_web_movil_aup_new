@@ -156,10 +156,10 @@ export class VisitFormStore {
       if (!reporteId) throw new Error('No se pudo iniciar el reporte');
 
       this._state.update(s => ({ ...s, visitId: visitaId, reporteId }));
-      await this.visitas.saveReporte(reporteId, this._state().data);
     }
 
     if (!reporteId) throw new Error('Sin reporteId activo');
+    await this.visitas.saveReporte(reporteId, this._state().data);
     await this.visitas.enviarReporte(reporteId);
     return false;
   }

@@ -106,4 +106,7 @@ export interface VisitData {
   cosechaCeraKg: number;
   notas: string;
   firma: string;
+  nombreFirmaApicultor: string;
+  firmaInspector: string;
+  nombreFirmaInspector: string;
 }

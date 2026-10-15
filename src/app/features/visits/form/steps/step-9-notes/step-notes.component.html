@@ -8,10 +8,42 @@
               class="form-input resize-none"></textarea>
   </div>
 
-  <!-- Signature -->
-  <div>
-    <label class="form-label">Firma del apicultor</label>
-    <app-signature-pad (signatureChange)="onSignatureChange($event)" class="block mt-1" />
+  <!-- Apicultor signature -->
+  <div class="flex flex-col gap-3">
+    <div>
+      <label class="form-label">Firma del apicultor <span class="text-error">*</span></label>
+      <app-signature-pad
+        [value]="store.formData().firma ?? ''"
+        (signatureChange)="onApicultorSignatureChange($event)"
+        class="block mt-1" />
+    </div>
+    <div>
+      <label class="form-label" for="nombreFirmaApicultor">Nombre <span class="text-error">*</span></label>
+      <input id="nombreFirmaApicultor" type="text" formControlName="nombreFirmaApicultor"
+             maxlength="255" placeholder="Escribe el nombre completo" class="form-input mt-1" />
+      @if (form.controls.nombreFirmaApicultor.touched && form.controls.nombreFirmaApicultor.invalid) {
+        <p class="mt-1 text-xs text-error">El nombre del apicultor es obligatorio.</p>
+      }
+    </div>
+  </div>
+
+  <!-- Inspector signature -->
+  <div class="flex flex-col gap-3">
+    <div>
+      <label class="form-label">Firma del inspector <span class="text-error">*</span></label>
+      <app-signature-pad
+        [value]="store.formData().firmaInspector ?? ''"
+        (signatureChange)="onInspectorSignatureChange($event)"
+        class="block mt-1" />
+    </div>
+    <div>
+      <label class="form-label" for="nombreFirmaInspector">Nombre <span class="text-error">*</span></label>
+      <input id="nombreFirmaInspector" type="text" formControlName="nombreFirmaInspector"
+             maxlength="255" placeholder="Escribe el nombre completo" class="form-input mt-1" />
+      @if (form.controls.nombreFirmaInspector.touched && form.controls.nombreFirmaInspector.invalid) {
+        <p class="mt-1 text-xs text-error">El nombre del inspector es obligatorio.</p>
+      }
+    </div>
   </div>
 
   <!-- Summary -->
